@@ -44,7 +44,21 @@ __handleParts() {
 		exit 0;
 	fi;
 
-	while read part; do
-		eval "$sectionFn";
-	done < <(eval "$partsFn");
+	if [ -z "${__args[0]}" ]; then
+		{
+			echo -e "Error: Subcommand required\n";
+			__help "$partsFn" "$sectionFn";
+
+			exit 1;
+		} >&2;
+	fi;
+
+	if [ -z "$(eval "$partsFn" | grep "^${__args[0]}$")" ]; then
+		{
+			echo -e "Error: Unknown subcommand ${__args[0]}\n";
+			__help "$partsFn" "$sectionFn";
+
+			exit 1;
+		} >&2;
+	fi;
 }
