@@ -92,12 +92,15 @@ __handleParts() {
 	shift;
 
 	declare -A flags=();
+	declare -A setFlags=();
 
 	while read -r -d '' flag && read -r -d '' type && read -r -d ''; do
 		flags[$flag]="$type";
-	done < <(eval "$sectionFn" | __flags);
 
-	declare -A setFlags=();
+		if [ "$type" = "boolean" ]; then
+			setFlags[$flag]="false";
+		fi;
+	done < <(eval "$sectionFn" | __flags);
 
 	while [ $# -gt 0 ]; do
 		declare flag="$1";
