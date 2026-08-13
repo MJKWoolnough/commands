@@ -62,13 +62,15 @@ __handleParts() {
 	declare partsFn="$1";
 	declare sectionFn="$2";
 
-	if [ "${__args[0]:-}" = "--help" ]; then
+	set -- "${__args[@]}";
+
+	if [ "${1:-}" = "--help" ]; then
 		__help "$partsFn" "$sectionFn";
 
 		exit 0;
 	fi;
 
-	if [ -z "${__args[0]}" ]; then
+	if [ -z "${1:-}" ]; then
 		{
 			echo -e "Error: Subcommand required\n";
 			__help "$partsFn" "$sectionFn";
@@ -77,14 +79,63 @@ __handleParts() {
 		} >&2;
 	fi;
 
-	if [ -z "$(eval "$partsFn" | grep "^${__args[0]}$")" ]; then
+	if [ -z "$(eval "$partsFn" | grep "^$1$")" ]; then
 		{
-			echo -e "Error: Unknown subcommand ${__args[0]}\n";
+			echo -e "Error: Unknown subcommand $1\n";
 			__help "$partsFn" "$sectionFn";
 
 			exit 1;
 		} >&2;
 	fi;
 
-	__section_help "$sectionFn" "${__args[0]}";
+	declare part="$1";
+	shift;
+
+	declare -A flags=();
+
+	while read -r -d '' flag && read -r -d '' type && read -r -d ''; do
+		flags[$flag]="$type";
+	done < <(eval "$sectionFn" | __flags);
+
+	declare -A setFlags=();
+
+	while [ $# -gt 0 ]; do
+		declare flag="$1";
+		shift;
+
+		if [ "$flag" = "--help" ]; then
+			__section_help "$sectionFn" "$part";
+
+			exit 0;
+		elif [ ! -v flags[$flag] ]; then
+			{
+				echo -e "Error: Unknown flag: $flag\n";
+				__section_help "$sectionFn", "$part";
+
+				exit 2;
+			} >&2;
+		fi;
+
+		if [ "$flags[$flag]" = "boolean" ]; then
+			setFlags[$flag]="true";
+		else
+			setFlags[$flag]="$1";
+		fi;
+
+		shift;
+	done;
+
+	{
+		declare _part="$part";
+
+		unset part;
+		eval "$sectionFn";
+
+		for flag in "${!setFlags[@]}"; do
+			echo "declare $(echo "$flag" | tr -d '-')=${setFlags[$flag]@Q}";
+		done;
+
+		declare part="$_part";
+		eval "$sectionFn";
+	} | bash
 }
