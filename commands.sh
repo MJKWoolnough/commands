@@ -126,7 +126,7 @@ __handleParts() {
 		elif [ ! -v flags[$flag] ]; then
 			{
 				echo -e "Error: Unknown flag: $flag\n";
-				__section_help "$sectionFn", "$part";
+				__section_help "$sectionFn" "$part";
 
 				exit 2;
 			} >&2;
