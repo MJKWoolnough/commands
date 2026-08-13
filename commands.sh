@@ -12,6 +12,12 @@ __description() {
 	sed -n '/^#/!q; p' | sed -e 's/^# *//';
 }
 
+_flags() {
+	while read line; do
+		 printf "%s\0%s\0%s\0" "$(echo "$line" | cut -d' ' -f2)" "$(echo "$line" | cut -d' ' -f3)" "$(echo "$line" | cut -d'#' -f2-)";
+	done < (sed -n '1,/^[^#:]/p' <<<"$section" | grep "^: ");
+}
+
 __help() {
 	declare partsFn="$1";
 	declare sectionFn="$2";
