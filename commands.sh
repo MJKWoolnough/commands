@@ -93,9 +93,18 @@ __handleParts() {
 
 	declare -A flags=();
 	declare -A setFlags=();
+	declare -A aliases=();
 
 	while read -r -d '' flag && read -r -d '' type && read -r -d ''; do
-		flags[$flag]="$type";
+		{
+			read flag;
+
+			flags[$flag]="$type";
+
+			while read alias; do
+				aliases[$alias]="$flag";
+			done;
+		} < <(echo "$flag" | tr ',' '\n');
 
 		if [ "$type" = "boolean" ]; then
 			setFlags[$flag]="false";
@@ -105,6 +114,10 @@ __handleParts() {
 	while [ $# -gt 0 ]; do
 		declare flag="$1";
 		shift;
+
+		if [ -v aliases[$flag] ]; then
+			flag="${aliases[$flag]}";
+		fi;
 
 		if [ "$flag" = "--help" ]; then
 			__section_help "$sectionFn" "$part";
