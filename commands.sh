@@ -12,10 +12,10 @@ __description() {
 	sed -n '/^#/!q; p' | sed -e 's/^# *//';
 }
 
-_flags() {
+__flags() {
 	while read line; do
-		 printf "%s\0%s\0%s\0" "$(echo "$line" | cut -d' ' -f2)" "$(echo "$line" | cut -d' ' -f3)" "$(echo "$line" | cut -d'#' -f2-)";
-	done < (sed -n '1,/^[^#:]/p' <<<"$section" | grep "^: ");
+		printf "%s\0%s\0%s\0" "$(echo "$line" | cut -d' ' -f2)" "$(echo "$line" | cut -d' ' -f3)" "$(echo "$line" | cut -d'#' -f2-)";
+	done < <(sed -n '1,/^[^#:]/p' | grep "^: ");
 }
 
 __help() {
@@ -38,6 +38,24 @@ __help() {
 
 		echo "$(eval "$sectionFn" | __description)";
 	done < <(eval "$partsFn");
+}
+
+__section_help() {
+	declare sectionFn="$1";
+	declare part="$2";
+
+	echo "Usage: $0 $part [--help]";
+
+	eval "$sectionFn" | __description;
+
+	echo;
+
+	declare maxLength="$(eval "$sectionFn" | __flags | cut -d '' -f1 | wc -L)";
+
+	while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
+		printf "  %-${maxLength}s" "$flag";
+		echo "  $desc";
+	done < <(eval "$sectionFn" | __flags);
 }
 
 __handleParts() {
@@ -67,4 +85,6 @@ __handleParts() {
 			exit 1;
 		} >&2;
 	fi;
+
+	__section_help "$sectionFn" "${__args[0]}";
 }
