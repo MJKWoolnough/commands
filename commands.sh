@@ -14,7 +14,7 @@ __description() {
 
 __flags() {
 	while read line; do
-		printf "%s\0%s\0%s\0" "$(echo "$line" | cut -d' ' -f2)" "$(echo "$line" | cut -d' ' -f3)" "$(echo "$line" | cut -d'#' -f2-)";
+		printf "%s\0%s\0%s\0" "$(echo "$line" | cut -d' ' -f2)" "$(echo "$line" | cut -d'#' -f1 | cut -d' ' -f3)" "$(echo "$line" | cut -d'#' -f2-)";
 	done < <(sed -n '1,/^[^#:]/p' | grep "^: ");
 }
 
@@ -58,9 +58,9 @@ __section_help() {
 		flag="${flag%,*}";
 
 		if [ "${type:0:1}" = "[" ]; then
-			echo -n " [$flag$(__flag_type "$type")]";
+			echo -n " [$flag$(__flag_type "${type:-value}")]";
 		else
-			echo -n " $flag$(__flag_type "$type")";
+			echo -n " $flag$(__flag_type "${type:-value}")";
 		fi;
 	done < <(eval "$sectionFn" | __flags);
 
