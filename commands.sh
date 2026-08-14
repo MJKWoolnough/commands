@@ -50,7 +50,7 @@ __section_help() {
 
 	echo;
 
-	declare maxLength="$(eval "$sectionFn" | __flags | cut -d '' -f1 | wc -L)";
+	declare maxLength="$(eval "$sectionFn" | __flags | while read -r -d '' flag && read -r -d '' && read -r -d ''; do echo "$flag"; done | wc -L)";
 
 	while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
 		printf "  %-${maxLength}s" "$flag";
