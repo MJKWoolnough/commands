@@ -141,7 +141,7 @@ __handleParts() {
 		shift;
 	done;
 
-	{
+	exec "$BASH" <(
 		declare _part="$part";
 
 		unset part;
@@ -153,5 +153,5 @@ __handleParts() {
 
 		declare part="$_part";
 		eval "$sectionFn";
-	} | bash
+	);
 }
