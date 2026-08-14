@@ -40,11 +40,31 @@ __help() {
 	done < <(eval "$partsFn");
 }
 
+__flag_type() {
+	declare type="$(echo "$1" | sed -e 's/^\["//' -e 's/\]$//')";
+
+	if [ "$type" != "boolean" ]; then
+		echo " $type";
+	fi;
+}
+
 __section_help() {
 	declare sectionFn="$1";
 	declare part="$2";
 
-	echo "Usage: $0 $part [--help]";
+	echo -n "Usage: $0 $part [--help]";
+
+	while read -r -d '' flag && read -r -d '' type && read -r -d ''; do
+		flag="${flag%,*}";
+
+		if [ "${type:0:1}" = "[" ]; then
+			echo -n " [$flag$(__flag_type "$type")]";
+		else
+			echo -n " $flag$(__flag_type "$type")";
+		fi;
+	done < <(eval "$sectionFn" | __flags);
+
+	echo;
 
 	eval "$sectionFn" | __description;
 
