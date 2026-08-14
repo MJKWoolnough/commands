@@ -14,7 +14,7 @@ __description() {
 
 __flags() {
 	while read line; do
-		printf "%s\0%s\0%s\0" "$(echo "$line" | cut -d' ' -f2)" "$(echo "$line" | cut -d'#' -f1 | cut -d' ' -f3)" "$(echo "$line" | cut -d'#' -f2-)";
+		printf "%s\0%s\0%s\0" "$(echo "$line" | cut -d' ' -f2)" "$(echo "$line" | cut -d'#' -f1 | cut -d' ' -f3)" "$(echo "$line" | cut -s -d'#' -f2-)";
 	done < <(sed -n '1,/^[^#:]/p' | grep "^: ");
 }
 
@@ -73,8 +73,10 @@ __section_help() {
 	declare maxLength="$(eval "$sectionFn" | __flags | while read -r -d '' flag && read -r -d '' && read -r -d ''; do echo "$flag"; done | wc -L)";
 
 	while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
-		printf "  %-${maxLength}s" "$flag";
-		echo "  $desc";
+		if [ -n "$desc" ]; then
+			printf "  %-${maxLength}s" "$flag";
+			echo "  $desc";
+		fi;
 	done < <(eval "$sectionFn" | __flags);
 }
 
