@@ -8,6 +8,20 @@ sections() {
 	__handleParts "grep '^$start' ${0@Q} | cut -b'$(( ${#start} + 1))-' | grep -v '^$'"  "sed -n -e '/^$start'\${part:-}'$/,/^--/{//!p}' ${0@Q}";
 }
 
+files() {
+	declare general="${1}";
+	shift;
+	declare -a sections=("$@");
+	declare base="$(dirname "$0")";
+
+	printf -v list '%s\n' "${sections[@]}";
+	printf -v in '|%q' "${sections[@]}";
+
+	in="${in:1}";
+
+	__handleParts "echo -en ${list@Q}"  "case \${part:-} in \"\") $(if [ -n "$general" ]; then echo "cat ${general@Q}"; fi);;$in) cat \$part;;esac";
+}
+
 __description() {
 	sed -n '/^#/!q; p' | sed -e 's/^# *//';
 }
