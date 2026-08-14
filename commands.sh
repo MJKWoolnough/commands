@@ -23,7 +23,7 @@ files() {
 }
 
 __description() {
-	sed -n '/^#/!q; p' | sed -e 's/^# *//';
+	sed -n '/^#/!q; p' | sed -e '1{/^#!/d}' -e 's/^# *//';
 }
 
 __flags() {
