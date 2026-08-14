@@ -52,14 +52,16 @@ __section_help() {
 	declare sectionFn="$1";
 	declare part="$2";
 	declare additional=false;
+	declare additionalDesc="";
 
 	echo -n "Usage: $0 $part [--help]";
 
-	while read -r -d '' flag && read -r -d '' type && read -r -d ''; do
+	while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
 		flag="${flag%,*}";
 
 		if [ "$flag" = "..." ]; then
 			additional=true;
+			additionalDesc="$desc";
 		elif [ "${type:0:1}" = "[" ]; then
 			echo -n " [$flag$(__flag_type "${type:-value}")]";
 		else
@@ -75,16 +77,20 @@ __section_help() {
 
 	eval "$sectionFn" | __description;
 
-	echo;
-
 	declare maxLength="$(eval "$sectionFn" | __flags | while read -r -d '' flag && read -r -d '' && read -r -d ''; do echo "$flag"; done | wc -L)";
 
+	echo -e "\nFlags:"
+
 	while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
-		if [ -n "$desc" ]; then
+		if [ -n "$desc" -a "$flag" != "..." ]; then
 			printf "  %-${maxLength}s" "$flag";
 			echo "  $desc";
 		fi;
 	done < <(eval "$sectionFn" | __flags);
+
+	if [ -n "$additionalDesc" ]; then
+		echo -e "\nArgs:\n$(echo "$additionalDesc" | sed -e 's/^/  /')";
+	fi;
 }
 
 __handleParts() {
