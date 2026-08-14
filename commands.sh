@@ -123,6 +123,8 @@ __handleParts() {
 	declare -A flags=();
 	declare -A setFlags=();
 	declare -A aliases=();
+	declare -a args=();
+	declare hasAdditional=false;
 
 	while read -r -d '' flag && read -r -d '' type && read -r -d ''; do
 		{
@@ -134,6 +136,10 @@ __handleParts() {
 				aliases[$alias]="$flag";
 			done;
 		} < <(echo "$flag" | tr ',' '\n');
+
+		if [ "$flag" = "..." ]; then
+			hasAdditional=true;
+		fi;
 
 		if [ "$type" = "boolean" ]; then
 			setFlags[$flag]="false";
@@ -153,12 +159,18 @@ __handleParts() {
 
 			exit 0;
 		elif [ ! -v flags[$flag] ]; then
-			{
-				echo -e "Error: Unknown flag: $flag\n";
-				__section_help "$sectionFn" "$part";
+			if $hasAdditional; then
+				args+=("$flag")
 
-				exit 2;
-			} >&2;
+				continue;
+			else
+				{
+					echo -e "Error: Unknown flag: $flag\n";
+					__section_help "$sectionFn" "$part";
+
+					exit 2;
+				} >&2;
+			fi;
 		fi;
 
 		if [ "$flags[$flag]" = "boolean" ]; then
@@ -182,5 +194,5 @@ __handleParts() {
 
 		declare part="$_part";
 		eval "$sectionFn";
-	);
+	) "${args[@]}";
 }
