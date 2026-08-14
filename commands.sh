@@ -51,18 +51,25 @@ __flag_type() {
 __section_help() {
 	declare sectionFn="$1";
 	declare part="$2";
+	declare additional=false;
 
 	echo -n "Usage: $0 $part [--help]";
 
 	while read -r -d '' flag && read -r -d '' type && read -r -d ''; do
 		flag="${flag%,*}";
 
-		if [ "${type:0:1}" = "[" ]; then
+		if [ "$flag" = "..." ]; then
+			additional=true;
+		elif [ "${type:0:1}" = "[" ]; then
 			echo -n " [$flag$(__flag_type "${type:-value}")]";
 		else
 			echo -n " $flag$(__flag_type "${type:-value}")";
 		fi;
 	done < <(eval "$sectionFn" | __flags);
+
+	if $additional; then
+		echo " ARGS";
+	fi;
 
 	echo;
 
