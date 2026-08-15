@@ -203,16 +203,15 @@ __handleParts() {
 	done;
 
 	exec "$BASH" <(
-		declare _part="$part";
-
-		unset part;
-		eval "$sectionFn";
+		(
+			unset part;
+			eval "$sectionFn";
+		);
 
 		for flag in "${!setFlags[@]}"; do
 			echo "declare $(echo "$flag" | tr -d '-')=${setFlags[$flag]@Q}";
 		done;
 
-		declare part="$_part";
 		eval "$sectionFn";
 	) "${args[@]}";
 }
