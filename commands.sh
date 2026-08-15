@@ -1,17 +1,17 @@
 #!/bin/bash
 
-__args=("$@");
+__args=( "$@" );
 
 sections() {
 	declare start="${1:?Start string required}";
 
-	__handleParts "grep '^$start' ${0@Q} | cut -b'$(( ${#start} + 1))-' | grep -v '^$'"  "sed -n -e '/^$start'\${part:-}'$/,/^--/{//!p}' ${0@Q}";
+	__handleParts "grep '^$start' ${0@Q} | cut -b'$(( ${#start} + 1 ))-' | grep -v '^$'" "sed -n -e '/^$start'\${part:-}'$/,/^--/{//!p}' ${0@Q}";
 }
 
 files() {
 	declare general="${1}";
 	shift;
-	declare -a sections=("$@");
+	declare -a sections=( "$@" );
 	declare base="$(dirname "$0")/";
 
 	printf -v list '%s\n' "${sections[@]}";
@@ -19,7 +19,11 @@ files() {
 
 	in="${in:1}";
 
-	__handleParts "echo -en ${list@Q}"  "case \${part:-} in \"\") $(if [ -n "$general" ]; then echo "cd ${base@Q};cat ${general@Q}"; fi);;$in) cd ${base@Q};cat \$part;;esac";
+	__handleParts "echo -en ${list@Q}" "case \${part:-} in \"\") $(
+		if [ -n "$general" ]; then
+			echo "cd ${base@Q};cat ${general@Q}";
+		fi;
+	);;$in) cd ${base@Q};cat \$part;;esac";
 }
 
 __description() {
@@ -37,7 +41,7 @@ __help() {
 	declare sectionFn="$2";
 
 	echo "Usage: $0 [--help] SUBCOMAND";
-	
+
 	eval "$sectionFn" | __description;
 
 	echo;
@@ -91,9 +95,13 @@ __section_help() {
 
 	eval "$sectionFn" | __description;
 
-	declare maxLength="$(eval "$sectionFn" | __flags | while read -r -d '' flag && read -r -d '' && read -r -d ''; do echo "$flag"; done | wc -L)";
+	declare maxLength="$(
+		eval "$sectionFn" | __flags | while read -r -d '' flag && read -r -d '' && read -r -d ''; do
+			echo "$flag";
+		done | wc -L;
+	)";
 
-	echo -e "\nFlags:"
+	echo -e "\nFlags:";
 
 	while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
 		if [ -n "$desc" -a "$flag" != "..." ]; then
@@ -182,7 +190,7 @@ __handleParts() {
 			exit 0;
 		elif [ ! -v flags[$flag] ]; then
 			if $hasAdditional; then
-				args+=("$flag")
+				args+=( "$flag" );
 
 				continue;
 			else
@@ -220,14 +228,16 @@ __handleParts() {
 			eval "$sectionFn" | head -n1;
 			unset part;
 			eval "$sectionFn" | head -n1;
-		) | { grep "^#!" | head -n1 | cut -b 3- || echo -n "$BASH"; } | xargs printf '%s\0';
+		) | {
+			grep "^#!" | head -n1 | cut -b 3- || echo -n "$BASH";
+		} | xargs printf '%s\0';
 	);
 
 	"${CMD[@]}" <(
 		(
 			unset part;
 			eval "$sectionFn";
-		);
+		)
 
 		for flag in "${!setFlags[@]}"; do
 			echo "declare $(echo "$flag" | tr -d '-')=${setFlags[$flag]@Q}";
