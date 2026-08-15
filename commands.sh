@@ -205,6 +205,13 @@ __handleParts() {
 
 		if [ "${flags[$flag]}" = "boolean" ]; then
 			setFlags[$flag]="true";
+		elif [ $# -eq 0 ]; then
+			{
+				echo -e "Error: Flag requires value: $flag\n";
+				__section_help "$sectionFn" "$part";
+
+				exit 2;
+			} >&2;
 		else
 			setFlags[$flag]="$1";
 		fi;
