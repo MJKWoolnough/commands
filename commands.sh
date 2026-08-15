@@ -141,6 +141,7 @@ __handleParts() {
 	shift;
 
 	declare -A flags=();
+	declare -A required=();
 	declare -A setFlags=();
 	declare -A aliases=();
 	declare -a args=();
@@ -150,8 +151,6 @@ __handleParts() {
 		{
 			read flag;
 
-			flags[$flag]="$type";
-
 			while read alias; do
 				aliases[$alias]="$flag";
 			done;
@@ -159,10 +158,13 @@ __handleParts() {
 
 		if [ "$flag" = "..." ]; then
 			hasAdditional=true;
-		fi;
-
-		if [ "$type" = "boolean" ]; then
+		elif [ "$type" = "boolean" ]; then
 			setFlags[$flag]="false";
+		elif [ "${type:0:1}" = "[" -a "${type: -1}" = "]" ]; then
+			flags[$flag]="${type:1:-1}";
+		else
+			required[$flag]=true;
+			flags[$flag]="$type";
 		fi;
 	done < <(eval "$sectionFn" | __flags);
 
@@ -200,6 +202,17 @@ __handleParts() {
 		fi;
 
 		shift;
+	done;
+
+	for flag in "${!required[@]}"; do
+		if [ ! -v setFlags[$flag] ]; then
+			{
+				echo -e "Error: Required flag not set: $flag\n";
+				__section_help "$sectionFn" "$part";
+
+				exit 2;
+			} >&2;
+		fi;
 	done;
 
 	mapfile -d '' CMD < <(
