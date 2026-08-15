@@ -212,6 +212,13 @@ __handleParts() {
 
 				exit 2;
 			} >&2;
+		elif [ "${flags[$flag]}" = "number" -a -z "$(grep "^[+-]\?[0-9]*\(\.[0-9]\+\)\?$" <<< "$1")" ]; then
+			{
+				echo -e "Error: Invalid flag value: $flag "$1"\n";
+				__section_help "$sectionFn" "$part";
+
+				exit 2;
+			} >&2;
 		else
 			setFlags[$flag]="$1";
 		fi;
