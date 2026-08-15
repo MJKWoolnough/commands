@@ -12,14 +12,14 @@ files() {
 	declare general="${1}";
 	shift;
 	declare -a sections=("$@");
-	declare base="$(dirname "$0")";
+	declare base="$(dirname "$0")/";
 
 	printf -v list '%s\n' "${sections[@]}";
 	printf -v in '|%q' "${sections[@]}";
 
 	in="${in:1}";
 
-	__handleParts "echo -en ${list@Q}"  "case \${part:-} in \"\") $(if [ -n "$general" ]; then echo "cat ${general@Q}"; fi);;$in) cat \$part;;esac";
+	__handleParts "echo -en ${list@Q}"  "case \${part:-} in \"\") $(if [ -n "$general" ]; then echo "cd ${base@Q};cat ${general@Q}"; fi);;$in) cd ${base@Q};cat \$part;;esac";
 }
 
 __description() {
