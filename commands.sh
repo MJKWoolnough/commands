@@ -202,7 +202,15 @@ __handleParts() {
 		shift;
 	done;
 
-	exec "$BASH" <(
+	mapfile -d '' CMD < <(
+		(
+			eval "$sectionFn" | head -n1;
+			unset part;
+			eval "$sectionFn" | head -n1;
+		) | { grep "^#!" | head -n1 | cut -b 3- || echo -n "$BASH"; } | xargs printf '%s\0';
+	);
+
+	"${CMD[@]}" <(
 		(
 			unset part;
 			eval "$sectionFn";
