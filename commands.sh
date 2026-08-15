@@ -193,7 +193,7 @@ __handleParts() {
 			fi;
 		fi;
 
-		if [ "$flags[$flag]" = "boolean" ]; then
+		if [ "${flags[$flag]}" = "boolean" ]; then
 			setFlags[$flag]="true";
 		else
 			setFlags[$flag]="$1";
