@@ -59,7 +59,7 @@ __help() {
 }
 
 __flag_type() {
-	declare type="$(echo "$1" | sed -e 's/^\["//' -e 's/\]$//')";
+	declare type="$(echo "$1" | sed -e 's/^\[\(.*\)\]$/\1/')";
 
 	if [ "$type" != "boolean" ]; then
 		echo " $type";
