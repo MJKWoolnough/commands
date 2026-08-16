@@ -121,7 +121,7 @@ __handleParts() {
 			echo -e "Error: Subcommand required\n";
 			__help "$partsFn" "$sectionFn";
 
-			exit 1;
+			exit 127;
 		} >&2;
 	fi;
 
@@ -130,7 +130,7 @@ __handleParts() {
 			echo -e "Error: Unknown subcommand $1\n";
 			__help "$partsFn" "$sectionFn";
 
-			exit 1;
+			exit 127;
 		} >&2;
 	fi;
 
