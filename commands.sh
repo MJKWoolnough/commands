@@ -32,7 +32,7 @@ __description() {
 
 __flags() {
 	while read line; do
-		printf "%s\0%s\0%s\0" "$(cut -d' ' -f2 <<<"$line")" "$(cut -d'#' -f1 <<<"$line" | cut -d' ' -f3)" "$(cut -s -d'#' -f2- <<<"$line")";
+		printf "%s\0%s\0%s\0" "$(sed -e 's/  +/ /g' <<<"$line" | cut -d' ' -f2)" "$(sed -e 's/  +/ /g' <<<"$line" | cut -d'#' -f1 | cut -d' ' -f3)" "$(cut -s -d'#' -f2- <<<"$line" | sed -e 's/^ *//')";
 	done < <(sed -n '1,/^[^#:]/p' | grep "^: ");
 }
 
@@ -247,7 +247,7 @@ __handleParts() {
 		} | xargs printf '%s\0';
 	);
 
-	exec "${CMD[@]}" <(
+	exec -a "$part" "${CMD[@]}" <(
 		(
 			unset part;
 			eval "$sectionFn";
