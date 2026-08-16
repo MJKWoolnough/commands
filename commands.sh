@@ -247,7 +247,7 @@ __handleParts() {
 		} | xargs printf '%s\0';
 	);
 
-	"${CMD[@]}" <(
+	exec "${CMD[@]}" <(
 		(
 			unset part;
 			eval "$sectionFn";
