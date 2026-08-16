@@ -17,13 +17,11 @@ files() {
 	printf -v list '%s\n' "${sections[@]}";
 	printf -v in '|%q' "${sections[@]}";
 
-	in="${in:1}";
-
 	__handleParts "echo -en ${list@Q}" "case \${part:-} in \"\") $(
 		if [ -n "$general" ]; then
 			echo "cd ${base@Q};cat ${general@Q}";
 		fi;
-	);;$in) cd ${base@Q};cat \$part;;esac";
+	);;${in:1}) cd ${base@Q};cat \$part;;esac";
 }
 
 __description() {
