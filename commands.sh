@@ -32,7 +32,7 @@ __description() {
 
 __flags() {
 	while read line; do
-		printf "%s\0%s\0%s\0" "$(sed -e 's/  +/ /g' <<<"$line" | cut -d' ' -f2)" "$(sed -e 's/  +/ /g' <<<"$line" | cut -d'#' -f1 | cut -d' ' -f3)" "$(cut -s -d'#' -f2- <<<"$line" | sed -e 's/^ *//')";
+		printf "%s\0%s\0%s\0" "$(sed -e 's/  +/ /g' <<< "$line" | cut -d' ' -f2)" "$(sed -e 's/  +/ /g' <<< "$line" | cut -d'#' -f1 | cut -d' ' -f3)" "$(cut -s -d'#' -f2- <<< "$line" | sed -e 's/^ *//')";
 	done < <(sed -n '1,/^[^#:]/p' | grep "^: ");
 }
 
@@ -59,7 +59,7 @@ __help() {
 }
 
 __flag_type() {
-	declare type="$(sed -e 's/^\[\(.*\)\]$/\1/' <<<"$1")";
+	declare type="$(sed -e 's/^\[\(.*\)\]$/\1/' <<< "$1")";
 
 	if [ "$type" != "boolean" ]; then
 		printf " %s" "$type";
@@ -111,7 +111,7 @@ __section_help() {
 	done < <(eval "$sectionFn" | __flags);
 
 	if [ -n "$additionalDesc" ]; then
-		echo -e "\nArgs:\n$(sed -e 's/^/  /' <<<"$additionalDesc")";
+		echo -e "\nArgs:\n$(sed -e 's/^/  /' <<< "$additionalDesc")";
 	fi;
 }
 
@@ -162,7 +162,7 @@ __handleParts() {
 			while read alias; do
 				aliases[$alias]="$flag";
 			done;
-		} < <(tr ',' '\n' <<<"$flag");
+		} < <(tr ',' '\n' <<< "$flag");
 
 		if [ "$flag" = "..." ]; then
 			hasAdditional=true;
@@ -254,7 +254,7 @@ __handleParts() {
 		)
 
 		for flag in "${!setFlags[@]}"; do
-			echo "declare $(tr -d '-' <<<"$flag")=${setFlags[$flag]@Q}";
+			echo "declare $(tr -d '-' <<< "$flag")=${setFlags[$flag]@Q}";
 		done;
 
 		eval "$sectionFn";
