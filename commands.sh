@@ -32,7 +32,7 @@ __description() {
 
 __flags() {
 	while read line; do
-		printf "%s\0%s\0%s\0" "$(echo "$line" | cut -d' ' -f2)" "$(echo "$line" | cut -d'#' -f1 | cut -d' ' -f3)" "$(echo "$line" | cut -s -d'#' -f2-)";
+		printf "%s\0%s\0%s\0" "$(cut -d' ' -f2 <<<"$line")" "$(cut -d'#' -f1 <<<"$line" | cut -d' ' -f3)" "$(cut -s -d'#' -f2- <<<"$line")";
 	done < <(sed -n '1,/^[^#:]/p' | grep "^: ");
 }
 
@@ -59,10 +59,10 @@ __help() {
 }
 
 __flag_type() {
-	declare type="$(echo "$1" | sed -e 's/^\[\(.*\)\]$/\1/')";
+	declare type="$(sed -e 's/^\[\(.*\)\]$/\1/' <<<"$1")";
 
 	if [ "$type" != "boolean" ]; then
-		echo " $type";
+		printf " %s" "$type";
 	fi;
 }
 
@@ -83,7 +83,7 @@ __section_help() {
 		elif [ "${type:0:1}" = "[" ]; then
 			echo -n " [$flag$(__flag_type "${type:-value}")]";
 		else
-			echo -n " $flag$(__flag_type "${type:-value}")";
+			printf " %s%s" "$flag" "$(__flag_type "${type:-value}")";
 		fi;
 	done < <(eval "$sectionFn" | __flags);
 
@@ -97,7 +97,7 @@ __section_help() {
 
 	declare maxLength="$(
 		eval "$sectionFn" | __flags | while read -r -d '' flag && read -r -d '' && read -r -d ''; do
-			echo "$flag";
+			printf "%s\n" "$flag";
 		done | wc -L;
 	)";
 
@@ -111,7 +111,7 @@ __section_help() {
 	done < <(eval "$sectionFn" | __flags);
 
 	if [ -n "$additionalDesc" ]; then
-		echo -e "\nArgs:\n$(echo "$additionalDesc" | sed -e 's/^/  /')";
+		echo -e "\nArgs:\n$(sed -e 's/^/  /' <<<"$additionalDesc")";
 	fi;
 }
 
@@ -162,7 +162,7 @@ __handleParts() {
 			while read alias; do
 				aliases[$alias]="$flag";
 			done;
-		} < <(echo "$flag" | tr ',' '\n');
+		} < <(tr ',' '\n' <<<"$flag");
 
 		if [ "$flag" = "..." ]; then
 			hasAdditional=true;
@@ -254,7 +254,7 @@ __handleParts() {
 		)
 
 		for flag in "${!setFlags[@]}"; do
-			echo "declare $(echo "$flag" | tr -d '-')=${setFlags[$flag]@Q}";
+			echo "declare $(tr -d '-' <<<"$flag")=${setFlags[$flag]@Q}";
 		done;
 
 		eval "$sectionFn";
