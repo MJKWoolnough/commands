@@ -14,8 +14,8 @@ files() {
 	declare -a sections=( "$@" );
 	declare base="$(dirname "$0")/";
 
-	printf -v list '%s\n' "${sections[@]}";
-	printf -v in '|%q' "${sections[@]}";
+	printf -v list "%s\n" "${sections[@]}";
+	printf -v in "|%q" "${sections[@]}";
 
 	__handleParts "echo -en ${list@Q}" "case \${part:-} in \"\") $(
 		if [ -n "$general" ]; then
@@ -37,22 +37,14 @@ __flags() {
 __help() {
 	declare partsFn="$1";
 	declare sectionFn="$2";
-
-	echo "Usage: $0 [--help] SUBCOMAND";
-
-	eval "$sectionFn" | __description;
-
-	echo;
-
 	declare maxLength="$(eval "$partsFn" | wc -L)";
 
-	echo "Subcommands:";
+	echo "Usage: $0 [--help] SUBCOMAND";
+	eval "$sectionFn" | __description;
+	echo -e "\nSubcommands:";
 
 	while read part; do
-		printf "  %-${maxLength}s" "$part";
-		echo -n "  ";
-
-		echo "$(eval "$sectionFn" | __description)";
+		printf "  %-${maxLength}s  %s" "$part" "$(eval "$sectionFn" | __description)";
 	done < <(eval "$partsFn");
 }
 
@@ -103,8 +95,7 @@ __section_help() {
 
 	while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
 		if [ -n "$desc" -a "$flag" != "..." ]; then
-			printf "  %-${maxLength}s" "$flag";
-			echo "  $desc";
+			printf "  %-${maxLength}s  %s" "$flag" "$desc";
 		fi;
 	done < <(eval "$sectionFn" | __flags);
 
@@ -145,7 +136,6 @@ __handleParts() {
 
 	declare part="$1";
 	shift;
-
 	declare -A flags=();
 	declare -A required=();
 	declare -A setFlags=();
