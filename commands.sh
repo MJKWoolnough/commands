@@ -9,7 +9,7 @@ sections() {
 }
 
 files() {
-	declare general="${1}";
+	declare general="${1:-}";
 	shift;
 	declare -a sections=( "$@" );
 	declare base="$(dirname "$0")/";
