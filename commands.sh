@@ -91,13 +91,15 @@ __section_help() {
 		done | wc -L;
 	)";
 
-	echo -e "\nFlags:";
+	if [ "$maxLength" -gt 0 ]; then
+		echo -e "\nFlags:";
 
-	while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
-		if [ -n "$desc" -a "$flag" != "..." ]; then
-			printf "  %-${maxLength}s  %s" "$flag" "$desc";
-		fi;
-	done < <(eval "$sectionFn" | __flags);
+		while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
+			if [ -n "$desc" -a "$flag" != "..." ]; then
+				printf "  %-${maxLength}s  %s" "$flag" "$desc";
+			fi;
+		done < <(eval "$sectionFn" | __flags);
+	fi;
 
 	if [ -n "$additionalDesc" ]; then
 		echo -e "\nArgs:\n$(sed -e 's/^/  /' <<< "$additionalDesc")";
