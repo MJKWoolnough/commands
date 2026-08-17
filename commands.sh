@@ -34,6 +34,25 @@ __flags() {
 	done < <(sed -n '1,/^[^#:]/p' | grep "^: ");
 }
 
+__global_flags() {
+	declare sectionFn="$1";
+	declare maxLength="$(
+		eval "$sectionFn" | __flags | while read -r -d '' flag && read -r -d '' && read -r -d ''; do
+			printf "%s\n" "$flag";
+		done | wc -L;
+	)";
+
+	if [ "$maxLength" -gt 0 ]; then
+		echo -e "\nGlobal Flags:";
+
+		while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
+			if [ -n "$desc" -a "$flag" != "..." ]; then
+				printf "  %-${maxLength}s  %s" "$flag" "$desc";
+			fi;
+		done < <(part="" eval "$sectionFn" | __flags);
+	fi;
+}
+
 __help() {
 	declare partsFn="$1";
 	declare sectionFn="$2";
@@ -52,6 +71,8 @@ __help() {
 	while read part; do
 		printf "  %-${maxLength}s  %s" "$part" "$(eval "$sectionFn" | __description)";
 	done < <(eval "$partsFn");
+
+	__global_flags "$sectionFn";
 }
 
 __flag_type() {
@@ -106,6 +127,8 @@ __section_help() {
 			fi;
 		done < <(eval "$sectionFn" | __flags);
 	fi;
+
+	__global_flags "$sectionFn";
 
 	if [ -n "$additionalDesc" ]; then
 		echo -e "\nArgs:\n$(sed -e 's/^/  /' <<< "$additionalDesc")";
@@ -170,7 +193,10 @@ __handleParts() {
 			required[$flag]=true;
 			flags[$flag]="$type";
 		fi;
-	done < <(eval "$sectionFn" | __flags);
+	done < <(
+		part="" eval "$sectionFn" | __flags;
+		eval "$sectionFn" | __flags;
+	);
 
 	while [ $# -gt 0 ]; do
 		declare flag="$1";
