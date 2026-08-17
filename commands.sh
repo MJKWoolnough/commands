@@ -19,7 +19,7 @@ files() {
 
 	__handleParts "echo -en ${list@Q}" "case \${part:-} in \"\") $(
 		if [ -n "$general" ]; then
-			echo "cd ${base@Q};cat ${general@Q}";
+			echo "(cd ${base@Q};cat ${general@Q})";
 		fi;
 	);;${in:1}) cd ${base@Q};cat \$part;;esac";
 }
@@ -262,18 +262,14 @@ __handleParts() {
 	mapfile -d '' CMD < <(
 		(
 			eval "$sectionFn" | head -n1;
-			unset part;
-			eval "$sectionFn" | head -n1;
+			part="" eval "$sectionFn" | head -n1;
 		) | {
 			grep "^#!" | head -n1 | cut -b 3- || echo -n "$BASH";
 		} | xargs printf '%s\0';
 	);
 
 	exec -a "$part" "${CMD[@]}" <(
-		(
-			unset part;
-			eval "$sectionFn";
-		)
+		part="" eval "$sectionFn";
 
 		for flag in "${!setFlags[@]}"; do
 			echo "declare $(tr -d '-' <<< "$flag")=${setFlags[$flag]@Q}";
