@@ -36,18 +36,7 @@ __flags() {
 
 __print_flags() {
 	declare sectionFn="$1";
-	declare maxLength="$2";
-	declare part="${3:-}";
-
-	while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
-		if [ -n "$desc" -a "$flag" != "..." ]; then
-			printf "  %-${maxLength}s  %s\n" "$flag" "$desc";
-		fi;
-	done < <(eval "$sectionFn" | __flags);
-}
-
-__global_flags() {
-	declare sectionFn="$1";
+	declare part="${2:-}";
 	declare maxLength="$(
 		eval "$sectionFn" | __flags | while read -r -d '' flag && read -r -d '' && read -r -d ''; do
 			printf "%s\n" "$flag";
@@ -55,9 +44,57 @@ __global_flags() {
 	)";
 
 	if [ "$maxLength" -gt 0 ]; then
-		echo -e "\nGlobal Flags:";
+		if [ -z "$part" ]; then
+			echo -e "\nGlobal Flags:";
+		else
+			echo -e "\nFlags:";
+		fi;
 
-		__print_flags "$sectionFn" "$maxLength";
+		while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
+			if [ -n "$desc" -a "$flag" != "..." ]; then
+				printf "  %-${maxLength}s  %s\n" "$flag" "$desc";
+			fi;
+		done < <(eval "$sectionFn" | __flags);
+	fi;
+}
+
+__usage() {
+	declare sectionFn="$1";
+	declare part="${2:-}";
+	declare additional=false;
+	declare additionalDesc="";
+
+	echo -n "Usage: $0 [--help] ${part:-SUBCOMMAND}";
+
+	while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
+		flag="${flag%,*}";
+
+		if [ "$flag" = "..." ]; then
+			additional=true;
+			additionalDesc="$desc";
+		elif [ "${type:0:1}" = "[" ]; then
+			echo -n " [$flag$(__flag_type "${type:-value}")]";
+		else
+			printf " %s%s" "$flag" "$(__flag_type "${type:-value}")";
+		fi;
+	done < <(
+		if [ -n "$part" ]; then
+			part="" eval "$sectionFn" | __flags;
+		fi;
+
+		eval "$sectionFn" | __flags;
+	);
+
+	if $additional; then
+		echo " ARGS";
+	else
+		echo;
+	fi;
+
+	eval "$sectionFn" | __description;
+
+	if [ -n "$additionalDesc" ]; then
+		echo -e "\nArgs:\n$(sed -e 's/^/  /' <<< "$additionalDesc")";
 	fi;
 }
 
@@ -72,15 +109,14 @@ __help() {
 		exit 127;
 	fi;
 
-	echo "Usage: $0 [--help] SUBCOMAND";
-	eval "$sectionFn" | __description;
+	__usage "$sectionFn";
 	echo -e "\nSubcommands:";
 
 	while read part; do
 		printf "  %-${maxLength}s  %s\n" "$part" "$(eval "$sectionFn" | __description)";
 	done < <(eval "$partsFn");
 
-	__global_flags "$sectionFn";
+	__print_flags "$sectionFn";
 }
 
 __flag_type() {
@@ -94,49 +130,10 @@ __flag_type() {
 __section_help() {
 	declare sectionFn="$1";
 	declare part="$2";
-	declare additional=false;
-	declare additionalDesc="";
 
-	echo -n "Usage: $0 $part [--help]";
-
-	while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
-		flag="${flag%,*}";
-
-		if [ "$flag" = "..." ]; then
-			additional=true;
-			additionalDesc="$desc";
-		elif [ "${type:0:1}" = "[" ]; then
-			echo -n " [$flag$(__flag_type "${type:-value}")]";
-		else
-			printf " %s%s" "$flag" "$(__flag_type "${type:-value}")";
-		fi;
-	done < <(eval "$sectionFn" | __flags);
-
-	if $additional; then
-		echo " ARGS";
-	fi;
-
-	echo;
-
-	eval "$sectionFn" | __description;
-
-	declare maxLength="$(
-		eval "$sectionFn" | __flags | while read -r -d '' flag && read -r -d '' && read -r -d ''; do
-			printf "%s\n" "$flag";
-		done | wc -L;
-	)";
-
-	if [ "$maxLength" -gt 0 ]; then
-		echo -e "\nFlags:";
-
-		__print_flags "$sectionFn" "$maxLength" "$part";
-	fi;
-
-	__global_flags "$sectionFn";
-
-	if [ -n "$additionalDesc" ]; then
-		echo -e "\nArgs:\n$(sed -e 's/^/  /' <<< "$additionalDesc")";
-	fi;
+	__usage "$sectionFn" "$part";
+	__print_flags "$sectionFn" "$part";
+	__print_flags "$sectionFn";
 }
 
 __handleParts() {
