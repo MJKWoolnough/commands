@@ -31,19 +31,19 @@ files() {
 }
 
 __description() {
-	sed -n '/^#/!q; p' | sed -e '1{/^#!/d}' -e 's/^# *//';
+	eval "$sectionFn" | sed -n '/^#/!q; p' | sed -e '1{/^#!/d}' -e 's/^# *//';
 }
 
 __flags() {
 	while read line; do
 		printf "%s\0%s\0%s\0" "$(sed -e 's/  +/ /g' <<< "$line" | cut -d' ' -f2)" "$(sed -e 's/  +/ /g' <<< "$line" | cut -d'#' -f1 | cut -d' ' -f3)" "$(cut -s -d'#' -f2- <<< "$line" | sed -e 's/^ *//')";
-	done < <(sed -n '1,/^[^#:]/p' | grep "^: ");
+	done < <(eval "$sectionFn" | sed -n '1,/^[^#:]/p' | grep "^: ");
 }
 
 __print_flags() {
 	declare part="${1:-}";
 	declare maxLength="$(
-		eval "$sectionFn" | __flags | while read -r -d '' flag && read -r -d '' && read -r -d ''; do
+		__flags | while read -r -d '' flag && read -r -d '' && read -r -d ''; do
 			printf "%s\n" "$flag";
 		done | wc -L;
 	)";
@@ -55,11 +55,11 @@ __print_flags() {
 			echo -e "\nFlags:";
 		fi;
 
-		while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
+		__flags | while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
 			if [ -n "$desc" -a "$flag" != "..." ]; then
 				printf "  %-${maxLength}s  %s\n" "$flag" "$desc";
 			fi;
-		done < <(eval "$sectionFn" | __flags);
+		done;
 	fi;
 }
 
@@ -83,10 +83,10 @@ __usage() {
 		fi;
 	done < <(
 		if [ -n "$part" ]; then
-			part="" eval "$sectionFn" | __flags;
+			part="" __flags;
 		fi;
 
-		eval "$sectionFn" | __flags;
+		__flags;
 	);
 
 	if $additional; then
@@ -95,7 +95,7 @@ __usage() {
 		echo;
 	fi;
 
-	eval "$sectionFn" | __description;
+	__description;
 
 	if [ -n "$additionalDesc" ]; then
 		echo -e "\nArgs:\n$(sed -e 's/^/  /' <<< "$additionalDesc")";
@@ -115,7 +115,7 @@ __help() {
 	echo -e "\nSubcommands:";
 
 	while read part; do
-		printf "  %-${maxLength}s  %s\n" "$part" "$(eval "$sectionFn" | __description)";
+		printf "  %-${maxLength}s  %s\n" "$part" "$(__description)";
 	done < <(eval "$partsFn");
 
 	__print_flags;
@@ -191,8 +191,8 @@ __handleParts() {
 			flags[$flag]="$type";
 		fi;
 	done < <(
-		part="" eval "$sectionFn" | __flags;
-		eval "$sectionFn" | __flags;
+		part="" __flags;
+		__flags;
 	);
 
 	while [ $# -gt 0 ]; do
