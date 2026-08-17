@@ -39,6 +39,12 @@ __help() {
 	declare sectionFn="$2";
 	declare maxLength="$(eval "$partsFn" | wc -L)";
 
+	if [ "$maxLength" -eq 0 ]; then
+		echo "No subcommands defined.";
+
+		exit 127;
+	fi;
+
 	echo "Usage: $0 [--help] SUBCOMAND";
 	eval "$sectionFn" | __description;
 	echo -e "\nSubcommands:";
