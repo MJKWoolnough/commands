@@ -47,7 +47,7 @@ __global_flags() {
 
 		while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
 			if [ -n "$desc" -a "$flag" != "..." ]; then
-				printf "  %-${maxLength}s  %s" "$flag" "$desc";
+				printf "  %-${maxLength}s  %s\n" "$flag" "$desc";
 			fi;
 		done < <(part="" eval "$sectionFn" | __flags);
 	fi;
@@ -69,7 +69,7 @@ __help() {
 	echo -e "\nSubcommands:";
 
 	while read part; do
-		printf "  %-${maxLength}s  %s" "$part" "$(eval "$sectionFn" | __description)";
+		printf "  %-${maxLength}s  %s\n" "$part" "$(eval "$sectionFn" | __description)";
 	done < <(eval "$partsFn");
 
 	__global_flags "$sectionFn";
@@ -123,7 +123,7 @@ __section_help() {
 
 		while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
 			if [ -n "$desc" -a "$flag" != "..." ]; then
-				printf "  %-${maxLength}s  %s" "$flag" "$desc";
+				printf "  %-${maxLength}s  %s\n" "$flag" "$desc";
 			fi;
 		done < <(eval "$sectionFn" | __flags);
 	fi;
