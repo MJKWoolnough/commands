@@ -34,6 +34,18 @@ __flags() {
 	done < <(sed -n '1,/^[^#:]/p' | grep "^: ");
 }
 
+__print_flags() {
+	declare sectionFn="$1";
+	declare maxLength="$2";
+	declare part="${3:-}";
+
+	while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
+		if [ -n "$desc" -a "$flag" != "..." ]; then
+			printf "  %-${maxLength}s  %s\n" "$flag" "$desc";
+		fi;
+	done < <(eval "$sectionFn" | __flags);
+}
+
 __global_flags() {
 	declare sectionFn="$1";
 	declare maxLength="$(
@@ -45,11 +57,7 @@ __global_flags() {
 	if [ "$maxLength" -gt 0 ]; then
 		echo -e "\nGlobal Flags:";
 
-		while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
-			if [ -n "$desc" -a "$flag" != "..." ]; then
-				printf "  %-${maxLength}s  %s\n" "$flag" "$desc";
-			fi;
-		done < <(part="" eval "$sectionFn" | __flags);
+		__print_flags "$sectionFn" "$maxLength";
 	fi;
 }
 
@@ -121,11 +129,7 @@ __section_help() {
 	if [ "$maxLength" -gt 0 ]; then
 		echo -e "\nFlags:";
 
-		while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
-			if [ -n "$desc" -a "$flag" != "..." ]; then
-				printf "  %-${maxLength}s  %s\n" "$flag" "$desc";
-			fi;
-		done < <(eval "$sectionFn" | __flags);
+		__print_flags "$sectionFn" "$maxLength" "$part";
 	fi;
 
 	__global_flags "$sectionFn";
