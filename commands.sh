@@ -269,13 +269,27 @@ __handleParts() {
 		} | xargs printf '%s\0';
 	);
 
-	exec -a "$part" "${CMD[@]}" <(
-		part="" eval "$sectionFn";
+	if declare -F "${CMD[0]:-}" > /dev/null; then
+		"${CMD[@]}" <(
+			part="" eval "$sectionFn";
 
-		for flag in "${!setFlags[@]}"; do
-			echo "declare $(tr -d '-' <<< "$flag")=${setFlags[$flag]@Q}";
-		done;
+			for flag in "${!setFlags[@]}"; do
+				echo "declare $(tr -d '-' <<< "$flag")=${setFlags[$flag]@Q}";
+			done;
 
-		eval "$sectionFn";
-	) "${args[@]}";
+			eval "$sectionFn";
+		) "${args[@]}";
+
+		exit $?;
+	else
+		exec -a "$part" "${CMD[@]}" <(
+			part="" eval "$sectionFn";
+
+			for flag in "${!setFlags[@]}"; do
+				echo "declare $(tr -d '-' <<< "$flag")=${setFlags[$flag]@Q}";
+			done;
+
+			eval "$sectionFn";
+		) "${args[@]}";
+	fi;
 }
