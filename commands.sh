@@ -14,18 +14,25 @@ sections() {
 files() {
 	declare general="${1:-}";
 	shift;
-	declare -a sections=( "$@" );
 	declare base="$(dirname "$0")/";
+	declare -A sections=();
 
-	printf -v list "%s\n" "${sections[@]}";
-	printf -v in "|%q" "${sections[@]}";
+	for section; do
+		sections["$(basename "$section")"]="$section";
+	done;
+
+	printf -v list "%s\n" "${!sections[@]}";
 
 	declare partsFn="echo -en ${list@Q}";
-	declare sectionFn="case \${part:-} in \"\") $(
+	declare sectionFn="(cd ${base@Q};case \${part:-} in \"\")$(
 		if [ -n "$general" ]; then
-			echo "(cd ${base@Q};cat ${general@Q})";
+			echo -n "cat ${general@Q}";
 		fi;
-	);;${in:1}) cd ${base@Q};cat \$part;;esac";
+	);;$(
+		for part in "${!sections[@]}"; do
+			echo -n "${part@Q})cat ${sections[$part]@Q};;";
+		done;
+	)esac)";
 
 	__handleParts;
 }
