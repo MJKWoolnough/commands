@@ -282,12 +282,11 @@ __handle_parts() {
 	done;
 
 	mapfile -d '' CMD < <(
-		(
+		{
 			__sections | head -n1;
 			part="" __sections | head -n1;
-		) | {
-			grep "^#!" || echo -n "#!$BASH" | head -n1 | cut -b 3-;
-		} | xargs printf '%s\0';
+			echo -n "#!$BASH";
+		} | grep "^#!" | head -n1 | cut -b 3- | xargs printf '%s\0';
 	);
 
 	if declare -F "${CMD[0]:-}" > /dev/null; then
