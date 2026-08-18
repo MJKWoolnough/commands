@@ -37,14 +37,22 @@ files() {
 	__handle_parts;
 }
 
+__parts() {
+	eval "$partsFn";
+}
+
+__sections() {
+	eval "$sectionFn";
+}
+
 __description() {
-	eval "$sectionFn" | sed -n '/^#/!q; p' | sed -e '1{/^#!/d}' -e 's/^# *//';
+	__sections | sed -n '/^#/!q; p' | sed -e '1{/^#!/d}' -e 's/^# *//';
 }
 
 __flags() {
 	while read line; do
 		printf "%s\0%s\0%s\0" "$(sed -e 's/  +/ /g' <<< "$line" | cut -d' ' -f2)" "$(sed -e 's/  +/ /g' <<< "$line" | cut -d'#' -f1 | cut -d' ' -f3)" "$(cut -s -d'#' -f2- <<< "$line" | sed -e 's/^ *//')";
-	done < <(eval "$sectionFn" | sed -n '1,/^[^#:]/p' | grep "^: ");
+	done < <(__sections | sed -n '1,/^[^#:]/p' | grep "^: ");
 }
 
 __print_flags() {
@@ -110,7 +118,7 @@ __usage() {
 }
 
 __help() {
-	declare maxLength="$(eval "$partsFn" | wc -L)";
+	declare maxLength="$(__parts | wc -L)";
 
 	if [ "$maxLength" -eq 0 ]; then
 		echo "No subcommands defined.";
@@ -123,7 +131,7 @@ __help() {
 
 	while read part; do
 		printf "  %-${maxLength}s  %s\n" "$part" "$(__description)";
-	done < <(eval "$partsFn");
+	done < <(__parts);
 
 	__print_flags;
 }
@@ -143,13 +151,13 @@ __section_help() {
 }
 
 __script() {
-	part="" eval "$sectionFn";
+	part="" __sections;
 
 	for flag in "${!setFlags[@]}"; do
 		echo "declare $(tr -d '-' <<< "$flag")=${setFlags[$flag]@Q}";
 	done;
 
-	eval "$sectionFn";
+	__sections;
 }
 
 __handle_parts() {
@@ -170,7 +178,7 @@ __handle_parts() {
 		} >&2;
 	fi;
 
-	if [ -z "$(eval "$partsFn" | grep "^$1$")" ]; then
+	if [ -z "$(__parts | grep "^$1$")" ]; then
 		{
 			echo -e "Error: Unknown subcommand $1\n";
 			__help;
@@ -275,8 +283,8 @@ __handle_parts() {
 
 	mapfile -d '' CMD < <(
 		(
-			eval "$sectionFn" | head -n1;
-			part="" eval "$sectionFn" | head -n1;
+			__sections | head -n1;
+			part="" __sections | head -n1;
 		) | {
 			grep "^#!" | head -n1 | cut -b 3- || echo -n "$BASH";
 		} | xargs printf '%s\0';
