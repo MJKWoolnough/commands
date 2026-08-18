@@ -18,7 +18,7 @@ files() {
 	declare -A sections=();
 
 	for section; do
-		sections["$(basename "$section")"]="$section";
+		sections["${section##*/}"]="$section";
 	done;
 
 	printf -v list "%s\n" "${!sections[@]}";
