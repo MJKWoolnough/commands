@@ -135,6 +135,16 @@ __section_help() {
 	__print_flags;
 }
 
+__script() {
+	part="" eval "$sectionFn";
+
+	for flag in "${!setFlags[@]}"; do
+		echo "declare $(tr -d '-' <<< "$flag")=${setFlags[$flag]@Q}";
+	done;
+
+	eval "$sectionFn";
+}
+
 __handleParts() {
 	set -- "${__args[@]}";
 
@@ -266,26 +276,10 @@ __handleParts() {
 	);
 
 	if declare -F "${CMD[0]:-}" > /dev/null; then
-		"${CMD[@]}" <(
-			part="" eval "$sectionFn";
-
-			for flag in "${!setFlags[@]}"; do
-				echo "declare $(tr -d '-' <<< "$flag")=${setFlags[$flag]@Q}";
-			done;
-
-			eval "$sectionFn";
-		) "${args[@]}";
+		"${CMD[@]}" <(__script) "${args[@]}";
 
 		exit $?;
-	else
-		exec -a "$part" "${CMD[@]}" <(
-			part="" eval "$sectionFn";
-
-			for flag in "${!setFlags[@]}"; do
-				echo "declare $(tr -d '-' <<< "$flag")=${setFlags[$flag]@Q}";
-			done;
-
-			eval "$sectionFn";
-		) "${args[@]}";
 	fi;
+
+	exec -a "$part" "${CMD[@]}" <(__script) "${args[@]}";
 }
