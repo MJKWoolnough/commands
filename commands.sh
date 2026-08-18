@@ -8,7 +8,7 @@ sections() {
 	declare partsFn="grep '^$start' ${0@Q} | cut -b'$(( ${#start} + 1 ))-' | grep -v '^$'";
 	declare sectionFn="sed -n -e '/^$start'\${part:-}'$/,/^--/{//!p}' ${0@Q}";
 
-	__handleParts;
+	__handle_parts;
 }
 
 files() {
@@ -34,7 +34,7 @@ files() {
 		done;
 	)esac)";
 
-	__handleParts;
+	__handle_parts;
 }
 
 __description() {
@@ -152,7 +152,7 @@ __script() {
 	eval "$sectionFn";
 }
 
-__handleParts() {
+__handle_parts() {
 	set -- "${__args[@]}";
 
 	if [ "${1:-}" = "--help" ]; then
