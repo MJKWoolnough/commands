@@ -286,7 +286,7 @@ __handle_parts() {
 			__sections | head -n1;
 			part="" __sections | head -n1;
 		) | {
-			grep "^#!" | head -n1 | cut -b 3- || echo -n "$BASH";
+			grep "^#!" || echo -n "#!$BASH" | head -n1 | cut -b 3-;
 		} | xargs printf '%s\0';
 	);
 
