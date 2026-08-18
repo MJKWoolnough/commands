@@ -71,7 +71,7 @@ __print_flags() {
 		fi;
 
 		__flags | while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
-			if [ -n "$desc" -a "$flag" != "..." ]; then
+			if [ -n "$desc" -a "$flag" != "..." -a "$flag" != "…" ]; then
 				printf "  %-${maxLength}s  %s\n" "$flag" "$desc";
 			fi;
 		done;
@@ -88,7 +88,7 @@ __usage() {
 	while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
 		flag="${flag%,*}";
 
-		if [ "$flag" = "..." ]; then
+		if [ "$flag" = "..." -o "$flag" = "…" ]; then
 			additional=true;
 			additionalDesc="$desc";
 		elif [ "${type:0:1}" = "[" ]; then
