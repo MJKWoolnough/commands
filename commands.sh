@@ -72,7 +72,7 @@ __print_flags() {
 
 		__flags | while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
 			if [ -n "$desc" -a "$flag" != "..." -a "$flag" != "…" ]; then
-				printf "  %-${maxLength}s  %s\n" "$flag" "$desc";
+				printf "  %-${maxLength}s${desc:+  }%s\n" "$flag" "$desc";
 			fi;
 		done;
 	fi;
@@ -130,7 +130,8 @@ __help() {
 	echo -e "\nSubcommands:";
 
 	while read part; do
-		printf "  %-${maxLength}s  %s\n" "$part" "$(__description)";
+		declare desc="$(__description)";
+		printf "  %-${maxLength}s${desc:+  }%s\n" "$part" "$desc";
 	done < <(__parts);
 
 	__print_flags;

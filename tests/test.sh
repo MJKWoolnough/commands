@@ -8,11 +8,11 @@ declare -A tests=(
 Usage: 1/test.sh [--help] SUBCOMMAND
 
 Subcommands:
-  abc  "
+  abc"
 	["1/test.sh --help"]="Usage: 1/test.sh [--help] SUBCOMMAND
 
 Subcommands:
-  abc  "
+  abc"
   	["1/test.sh abc"]="1"
   	["1/test.sh abc --help"]="Usage: 1/test.sh [--help] abc"
 );
