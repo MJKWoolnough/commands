@@ -17,12 +17,24 @@ Subcommands:
   	["1/test.sh abc --help"]="Usage: 1/test.sh [--help] abc"
 );
 
+declare debug=false;
+
+if [ "$1" = "--debug" ]; then
+	debug=true;
+fi;
+
 for cmd in "${!tests[@]}"; do
 	declare result="$($cmd 2>&1)";
 
 	if [ "$result" != "${tests[$cmd]}" ]; then
 		echo "Command: $cmd";
-		echo "	Expecting: ${tests[$cmd]}";
-		echo "	Got: $result";
+		echo "Command: $cmd" | sed -e 's/./=/g';
+		echo;
+		echo -e "Expecting\n---------";
+		$debug && xxd <<<"${tests[$cmd]}" || echo "${tests[$cmd]}";
+		echo;
+		echo -e "Got\n---";
+		$debug && xxd <<<"$result" || echo "$result";
+		echo;
 	fi;
 done;
