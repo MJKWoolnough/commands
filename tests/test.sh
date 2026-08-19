@@ -111,6 +111,13 @@ Flags:
 FUNC"
 	["5/test.sh bash"]="BASH"
 	["5/test.sh python"]="123"
+	["6/test.sh"]="Error: Subcommand required
+
+Usage: 6/test.sh [--help] SUBCOMMAND
+
+Subcommands:
+  abc  Description"
+	["6/test.sh abc"]="123"
 );
 
 declare debug=false;
