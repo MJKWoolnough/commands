@@ -91,7 +91,7 @@ __usage() {
 		if [ "$flag" = "..." -o "$flag" = "…" ]; then
 			additional=true;
 			additionalDesc="$desc";
-		elif [ "${type:0:1}" = "[" ]; then
+		elif [ "${type:0:1}" = "[" -o "$type" = "boolean" ]; then
 			echo -n " [$flag$(__flag_type "${type:-value}")]";
 		else
 			printf " %s%s" "$flag" "$(__flag_type "${type:-value}")";
