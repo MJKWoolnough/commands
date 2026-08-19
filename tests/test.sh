@@ -61,6 +61,52 @@ The second subcommand
 Flags:
   --flag     First flag
   --another  Second flag"
+  	["4/test.sh abc"]="Error: Required flag not set: --flag
+
+Usage: 4/test.sh [--help] abc --flag string [--another]
+The first subcommand
+
+Flags:
+  --flag     First flag
+  --another  Second flag"
+  	["4/test.sh abc --flag something"]="something
+false"
+  	["4/test.sh abc --flag somethingElse --another"]="somethingElse
+true"
+  	["4/test.sh abc --flag something --other"]="Error: Unknown flag: --other
+
+Usage: 4/test.sh [--help] abc --flag string [--another]
+The first subcommand
+
+Flags:
+  --flag     First flag
+  --another  Second flag"
+  	["4/test.sh defgh"]="Error: Required flag not set: --another
+
+Usage: 4/test.sh [--help] defgh [--flag string] --another number
+The second subcommand
+
+Flags:
+  --flag     First flag
+  --another  Second flag"
+  	["4/test.sh defgh --another"]="Error: Flag requires value: --another
+
+Usage: 4/test.sh [--help] defgh [--flag string] --another number
+The second subcommand
+
+Flags:
+  --flag     First flag
+  --another  Second flag"
+  	["4/test.sh defgh --another nan"]="Error: Invalid flag value: --another nan
+
+Usage: 4/test.sh [--help] defgh [--flag string] --another number
+The second subcommand
+
+Flags:
+  --flag     First flag
+  --another  Second flag"
+  	["4/test.sh defgh --another 123.45"]="GOOD
+123.45"
 );
 
 declare debug=false;
