@@ -15,6 +15,22 @@ Subcommands:
   abc"
   	["1/test.sh abc"]="1"
   	["1/test.sh abc --help"]="Usage: 1/test.sh [--help] abc"
+	["2/test.sh"]="Error: Subcommand required
+
+Usage: 2/test.sh [--help] SUBCOMMAND
+
+Subcommands:
+  abc
+  def"
+	["2/test.sh --help"]="Usage: 2/test.sh [--help] SUBCOMMAND
+
+Subcommands:
+  abc
+  def"
+  	["2/test.sh abc"]="1"
+  	["2/test.sh def"]="2"
+  	["2/test.sh abc --help"]="Usage: 2/test.sh [--help] abc"
+  	["2/test.sh def --help"]="Usage: 2/test.sh [--help] def"
 );
 
 declare debug=false;
