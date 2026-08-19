@@ -107,6 +107,10 @@ Flags:
   --another  Second flag"
   	["4/test.sh defgh --another 123.45"]="GOOD
 123.45"
+	["5/test.sh func"]="FUNCTION
+FUNC"
+	["5/test.sh bash"]="BASH"
+	["5/test.sh python"]="123"
 );
 
 declare debug=false;
