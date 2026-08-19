@@ -13,8 +13,8 @@ Subcommands:
 
 Subcommands:
   abc"
-  	["1/test.sh abc"]="1"
-  	["1/test.sh abc --help"]="Usage: 1/test.sh [--help] abc"
+	["1/test.sh abc"]="1"
+	["1/test.sh abc --help"]="Usage: 1/test.sh [--help] abc"
 	["2/test.sh"]="Error: Subcommand required
 
 Usage: 2/test.sh [--help] SUBCOMMAND
@@ -27,10 +27,21 @@ Subcommands:
 Subcommands:
   abc
   def"
-  	["2/test.sh abc"]="1"
-  	["2/test.sh def"]="2"
-  	["2/test.sh abc --help"]="Usage: 2/test.sh [--help] abc"
-  	["2/test.sh def --help"]="Usage: 2/test.sh [--help] def"
+	["2/test.sh abc"]="1"
+	["2/test.sh def"]="2"
+	["2/test.sh abc --help"]="Usage: 2/test.sh [--help] abc"
+	["2/test.sh def --help"]="Usage: 2/test.sh [--help] def"
+	["3/test.sh"]="Error: Subcommand required
+
+Usage: 3/test.sh [--help] SUBCOMMAND
+
+Subcommands:
+  abc    The first subcommand
+  defgh  The second subcommand"
+  	["3/test.sh abc --help"]="Usage: 3/test.sh [--help] abc
+The first subcommand"
+  	["3/test.sh defgh --help"]="Usage: 3/test.sh [--help] defgh
+The second subcommand"
 );
 
 declare debug=false;
