@@ -42,6 +42,25 @@ Subcommands:
 The first subcommand"
   	["3/test.sh defgh --help"]="Usage: 3/test.sh [--help] defgh
 The second subcommand"
+	["4/test.sh"]="Error: Subcommand required
+
+Usage: 4/test.sh [--help] SUBCOMMAND
+
+Subcommands:
+  abc    The first subcommand
+  defgh  The second subcommand"
+  	["4/test.sh abc --help"]="Usage: 4/test.sh [--help] abc --flag string [--another]
+The first subcommand
+
+Flags:
+  --flag     First flag
+  --another  Second flag"
+  	["4/test.sh defgh --help"]="Usage: 4/test.sh [--help] defgh [--flag string] --another number
+The second subcommand
+
+Flags:
+  --flag     First flag
+  --another  Second flag"
 );
 
 declare debug=false;
