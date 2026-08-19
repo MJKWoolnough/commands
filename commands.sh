@@ -210,6 +210,7 @@ __handle_parts() {
 			hasAdditional=true;
 		elif [ "$type" = "boolean" ]; then
 			setFlags[$flag]="false";
+			flags[$flag]="$type";
 		elif [ "${type:0:1}" = "[" -a "${type: -1}" = "]" ]; then
 			flags[$flag]="${type:1:-1}";
 		else
