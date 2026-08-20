@@ -297,5 +297,5 @@ __handle_parts() {
 		exit $?;
 	fi;
 
-	exec -a "$part" "${CMD[@]}" <(__script) "${args[@]}";
+	exec "${CMD[@]}" <(__script) "${args[@]}";
 }
