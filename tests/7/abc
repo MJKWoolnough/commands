@@ -1,0 +1,10 @@
+# Description
+: --flag [string] # Optional flag
+: ...             # Additional args
+
+echo $global_var
+echo "ABC";
+
+echo "$#";
+echo "${1:-No Arg}"
+echo "${2:-No Arg}"

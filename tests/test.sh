@@ -118,6 +118,36 @@ Usage: 6/test.sh [--help] SUBCOMMAND
 Subcommands:
   abc  Description"
 	["6/test.sh abc"]="123"
+	["7/test.sh abc --help"]="Usage: 7/test.sh [--help] abc [--flag string] ARGS
+Description
+
+Args:
+  Additional args
+
+Flags:
+  --flag  Optional flag"
+	["7/test.sh abc"]="Global Func
+123
+ABC
+0
+No Arg
+No Arg"
+	["7/test.sh abc 1 2 3"]="Global Func
+123
+ABC
+3
+1
+2"
+	["7/test.sh def"]="123
+DEF
+0
+No Arg
+No Arg"
+	["7/test.sh def 1 2 3"]="123
+DEF
+3
+1
+2"
 );
 
 declare debug=false;
