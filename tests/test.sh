@@ -160,7 +160,32 @@ Usage: 8/test.sh [--help] abc --num integer
 
 Flags:
   --num  A number"
-  	["8/test.sh abc --num -1"]="-1");
+  	["8/test.sh abc --num -1"]="-1"
+  	["9/test.sh --help"]="Usage: 9/test.sh [--help] SUBCOMMAND --global string
+
+Subcommands:
+  abc
+
+Global Flags:
+  --global  A global flag"
+  	["9/test.sh abc --help"]="Usage: 9/test.sh [--help] abc --global string --another string
+
+Flags:
+  --another  Sub flag
+
+Global Flags:
+  --global  A global flag"
+  	["9/test.sh abc --another string"]="Error: Required flag not set: --global
+
+Usage: 9/test.sh [--help] abc --global string --another string
+
+Flags:
+  --another  Sub flag
+
+Global Flags:
+  --global  A global flag"
+  	["9/test.sh abc --global Foo --another Bar"]="Foo -> Bar"
+);
 
 declare debug=false;
 
