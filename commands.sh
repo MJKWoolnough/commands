@@ -5,8 +5,7 @@ __args=( "$@" );
 sections() {
 	declare start="${1:?Start string required}";
 
-	declare partsFn="grep '^$start' ${0@Q} | cut -b'$(( ${#start} + 1 ))-' | grep -v '^$'";
-	declare sectionFn="sed -n -e '/^$start'\${part:-}'$/,/^--/{//!p}' ${0@Q}";
+	eval "__parts() { grep '^$start' ${0@Q} | cut -b'$(( ${#start} + 1 ))-' | grep -v '^$'; }; __sections() { sed -n -e '/^$start'\${part:-}'$/,/^--/{//!p}' ${0@Q}; }";
 
 	__handle_parts;
 }
@@ -23,8 +22,7 @@ files() {
 
 	printf -v list "%s\n" "${!sections[@]}";
 
-	declare partsFn="echo -en ${list@Q}";
-	declare sectionFn="(cd ${base@Q};case \${part:-} in \"\")$(
+	eval "__parts() { echo -en ${list@Q}; }; __sections() { (cd ${base@Q};case \${part:-} in \"\")$(
 		if [ -n "$general" ]; then
 			echo -n "cat ${general@Q}";
 		fi;
@@ -32,17 +30,9 @@ files() {
 		for part in "${!sections[@]}"; do
 			echo -n "${part@Q})cat ${sections[$part]@Q};;";
 		done;
-	)esac)";
+	)esac) }";
 
 	__handle_parts;
-}
-
-__parts() {
-	eval "$partsFn";
-}
-
-__sections() {
-	eval "$sectionFn";
 }
 
 __description() {
