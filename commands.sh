@@ -48,8 +48,10 @@ __flags() {
 __print_flags() {
 	declare part="${1:-}";
 	declare maxLength="$(
-		__flags | while read -r -d '' flag && read -r -d '' && read -r -d ''; do
-			printf "%s\n" "$flag";
+		__flags | while read -r -d '' flag && read -r -d '' && read -r -d '' desc; do
+			if [ -n "$desc" -a "$flag" != "..." -a "$flag" != "…" ]; then
+				printf "%s\n" "$flag";
+			fi;
 		done | wc -L;
 	)";
 
