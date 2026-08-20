@@ -196,7 +196,7 @@ __handle_parts() {
 			done;
 		} < <(tr ',' '\n' <<< "$flag");
 
-		if [ "$flag" = "..." ]; then
+		if [ "$flag" = "..." -o "$flag" = "…" ]; then
 			hasAdditional=true;
 		elif [ "$type" = "boolean" ]; then
 			setFlags[$flag]="false";
