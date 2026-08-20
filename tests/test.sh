@@ -187,6 +187,12 @@ Global Flags:
   	["9/test.sh abc --global Foo --another Bar"]="Foo -> Bar"
   	["10/test.sh abc"]="1 2 3
 4"
+  	["11/test.sh abc --help"]="Usage: 11/test.sh [--help] abc --alias string
+
+Flags:
+  --alias,-a  Aliased flag"
+  	["11/test.sh abc --alias test"]="test"
+  	["11/test.sh abc -a test"]="test"
 );
 
 declare debug=false;
