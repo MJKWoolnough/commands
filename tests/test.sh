@@ -185,6 +185,8 @@ Flags:
 Global Flags:
   --global  A global flag"
   	["9/test.sh abc --global Foo --another Bar"]="Foo -> Bar"
+  	["10/test.sh abc"]="1 2 3
+4"
 );
 
 declare debug=false;
