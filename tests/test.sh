@@ -148,7 +148,19 @@ DEF
 3
 1
 2"
-);
+  	["8/test.sh abc --num nan"]="Error: Invalid flag value: --num nan
+
+Usage: 8/test.sh [--help] abc --num integer
+
+Flags:
+  --num  A number"
+  	["8/test.sh abc --num 1.1"]="Error: Invalid flag value: --num 1.1
+
+Usage: 8/test.sh [--help] abc --num integer
+
+Flags:
+  --num  A number"
+  	["8/test.sh abc --num -1"]="-1");
 
 declare debug=false;
 
