@@ -225,10 +225,10 @@ for cmd in "${!tests[@]}"; do
 		echo "Command: $cmd" | sed -e 's/./=/g';
 		echo;
 		echo -e "Expecting\n---------";
-		$debug && xxd <<<"${tests[$cmd]}" || echo "${tests[$cmd]}";
+		$debug && xxd <<< "${tests[$cmd]}" || echo "${tests[$cmd]}";
 		echo;
 		echo -e "Got\n---";
-		$debug && xxd <<<"$result" || echo "$result";
+		$debug && xxd <<< "$result" || echo "$result";
 		echo;
 	fi;
 done;
