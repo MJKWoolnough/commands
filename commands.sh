@@ -35,6 +35,17 @@ files() {
 	__handle_parts;
 }
 
+solo() {
+	declare part=""
+	declare solo=1;
+
+	__args=( "$part" "${__args[@]}" );
+
+	eval "__parts() { [ -n \"\$part\" ] && echo ${part@Q}; }; __sections() { [ -n \"\$part\" ] && cat ${0@Q}; }";
+
+	__handle_parts;
+}
+
 __description() {
 	__sections | sed -n '/^#/!q; p' | sed -e '1{/^#!/d}' -e 's/^# *//';
 }
@@ -143,12 +154,16 @@ __section_help() {
 	__print_flags;
 }
 
+__bind_flags() {
+	for flag in "${!setFlags[@]}"; do
+		echo "declare -g $(tr -d '-' <<< "$flag")=${setFlags[$flag]@Q}";
+	done;
+}
+
 __script() {
 	part="" __sections;
 
-	for flag in "${!setFlags[@]}"; do
-		echo "declare $(tr -d '-' <<< "$flag")=${setFlags[$flag]@Q}";
-	done;
+	__bind_flags;
 
 	__sections;
 }
@@ -274,6 +289,12 @@ __handle_parts() {
 			} >&2;
 		fi;
 	done;
+
+	if [ -n "${solo:-}" ]; then
+		eval "$(__bind_flags)";
+
+		return 0;
+	fi;
 
 	mapfile -d '' CMD < <(
 		{
