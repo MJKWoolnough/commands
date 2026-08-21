@@ -2,48 +2,43 @@
 
 __args=( "$@" );
 
-sections() {
-	declare start="${1:?Start string required}";
+commands() {
+	case "$#" in
+	0)
+		declare solo=1;
+		declare part="";
 
-	eval "__parts() { grep '^$start' ${0@Q} | cut -b'$(( ${#start} + 1 ))-' | grep -v '^$'; }; __sections() { sed -n -e '/^$start'\${part:-}'$/,/^--/{//!p}' ${0@Q}; }";
+		__args=( "$part" "${__args[@]}" );
 
-	__handle_parts;
-}
+		eval "__parts() { [ -n \"\$part\" ] && echo ${part@Q}; }; __sections() { [ -n \"\$part\" ] && cat ${0@Q}; }";;
+	1)
+		declare start="${1:?Start string required}";
 
-files() {
-	declare general="${1:-}";
-	shift;
-	declare base="$(dirname "$0")/";
-	declare -A sections=();
+		eval "__parts() { grep '^$start' ${0@Q} | cut -b'$(( ${#start} + 1 ))-' | grep -v '^$'; }; __sections() { sed -n -e '/^$start'\${part:-}'$/,/^--/{//!p}' ${0@Q}; }";;
+	*)
+		declare general="${1:-}";
+		shift;
+		declare base="$(dirname "$0")/";
+		declare -A sections=();
 
-	for section; do
-		sections["${section##*/}"]="$section";
-	done;
-
-	printf -v list "%s\n" "${!sections[@]}";
-
-	eval "__parts() { echo -en ${list@Q}; }; __sections() { (cd ${base@Q};case \${part:-} in \"\")$(
-		if [ -n "$general" ]; then
-			echo -n "cat ${general@Q}";
-		fi;
-	);;$(
-		for part in "${!sections[@]}"; do
-			echo -n "${part@Q})cat ${sections[$part]@Q};;";
+		for section; do
+			sections["${section##*/}"]="$section";
 		done;
-	)esac) }";
 
-	__handle_parts;
-}
+		printf -v list "%s\n" "${!sections[@]}";
 
-solo() {
-	declare part=""
-	declare solo=1;
+		eval "__parts() { echo -en ${list@Q}; }; __sections() { (cd ${base@Q};case \${part:-} in \"\")$(
+			if [ -n "$general" ]; then
+				echo -n "cat ${general@Q}";
+			fi;
+		);;$(
+			for part in "${!sections[@]}"; do
+				echo -n "${part@Q})cat ${sections[$part]@Q};;";
+			done;
+		)esac) }";;
+	esac;
 
-	__args=( "$part" "${__args[@]}" );
-
-	eval "__parts() { [ -n \"\$part\" ] && echo ${part@Q}; }; __sections() { [ -n \"\$part\" ] && cat ${0@Q}; }";
-
-	__handle_parts;
+	__handle_parts "${__args[@]}";
 }
 
 __description() {
@@ -167,8 +162,6 @@ __script() {
 }
 
 __handle_parts() {
-	set -- "${__args[@]}";
-
 	if [ "${1:-}" = "--help" ]; then
 		__help;
 

@@ -2,7 +2,7 @@
 
 . "$(dirname "$0")/../../commands.sh";
 
-sections --;
+commands --;
 
 --abc
 # The first subcommand

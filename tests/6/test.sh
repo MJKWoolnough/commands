@@ -2,4 +2,4 @@
 
 . "$(dirname "$0")/../../commands.sh";
 
-files "" abc;
+commands "" abc;

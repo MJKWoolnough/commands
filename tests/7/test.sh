@@ -9,4 +9,4 @@ func() {
 	. "$script" ;
 }
 
-files global abc def;
+commands global abc def;

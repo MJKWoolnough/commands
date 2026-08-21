@@ -8,7 +8,7 @@ some_func() {
 	bash "$1";
 }
 
-sections --;
+commands --;
 
 --func
 #!some_func

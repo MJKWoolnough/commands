@@ -4,7 +4,7 @@
 
 . "$(dirname "$0")/../../commands.sh";
 
-solo;
+commands;
 
 echo "${flag:-BAD}";
 echo 123;

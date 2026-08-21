@@ -8,7 +8,7 @@ some_func() {
 	. "$2";
 }
 
-sections --;
+commands --;
 
 --abc
 #!some_func "1 2 3"
