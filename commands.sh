@@ -161,10 +161,8 @@ __bind_flags() {
 }
 
 __script() {
-	part="" __sections;
-
 	__bind_flags;
-
+	part="" __sections;
 	__sections;
 }
 
