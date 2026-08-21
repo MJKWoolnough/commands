@@ -48,11 +48,11 @@ __flags() {
 __print_flags() {
 	declare part="${1:-}";
 	declare maxLength="$(
-		__flags | while read -r -d '' flag && read -r -d '' && read -r -d '' desc; do
+		while read -r -d '' flag && read -r -d '' && read -r -d '' desc; do
 			if [ -n "$desc" -a "$flag" != "..." -a "$flag" != "…" ]; then
 				printf "%s\n" "$flag";
 			fi;
-		done | wc -L;
+		done < <(__flags) | wc -L;
 	)";
 
 	if [ "$maxLength" -gt 0 ]; then
@@ -62,11 +62,11 @@ __print_flags() {
 			echo -e "\nFlags:";
 		fi;
 
-		__flags | while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
+		while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
 			if [ -n "$desc" -a "$flag" != "..." -a "$flag" != "…" ]; then
 				printf "  %-${maxLength}s${desc:+  }%s\n" "$flag" "$desc";
 			fi;
-		done;
+		done < <(__flags);
 	fi;
 }
 
