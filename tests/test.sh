@@ -193,6 +193,15 @@ Flags:
   --alias,-a  Aliased flag"
   	["11/test.sh abc --alias test"]="test"
   	["11/test.sh abc -a test"]="test"
+  	["12/test.sh"]="Error: Required flag not set: --flag
+
+Usage: 12/test.sh [--help]  --flag string
+My command
+
+Flags:
+  --flag  A flag"
+  	["12/test.sh --flag abc"]="abc
+123"
 );
 
 declare debug=false;
