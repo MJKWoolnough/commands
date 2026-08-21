@@ -287,6 +287,13 @@ __handle_parts() {
 		return 0;
 	fi;
 
+	declare script="$(mktemp --tmpdir=/dev/shm)";
+
+	__script > "$script";
+
+	exec {fd}<"$script";
+	rm -f "$script";
+
 	mapfile -d '' CMD < <(
 		{
 			__sections | head -n1;
@@ -296,10 +303,10 @@ __handle_parts() {
 	);
 
 	if declare -F "${CMD[0]:-}" > /dev/null; then
-		"${CMD[@]}" <(__script) "${args[@]}";
+		"${CMD[@]}" /proc/self/fd/$fd "${args[@]}";
 
 		exit $?;
 	fi;
 
-	exec "${CMD[@]}" <(__script) "${args[@]}";
+	exec "${CMD[@]}" /proc/self/fd/$fd "${args[@]}";
 }
