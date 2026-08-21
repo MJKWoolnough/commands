@@ -202,6 +202,13 @@ Flags:
   --flag  A flag"
   	["12/test.sh --flag abc"]="abc
 123"
+  	["13/test.sh abc"]="123
+echo \"123\";
+cat \"\$0\";"
+  	["13/test.sh def"]="456
+
+echo \"456\";
+cat \"\$0\";"
 );
 
 declare debug=false;
