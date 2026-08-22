@@ -233,6 +233,32 @@ __handle_parts() {
 
 			exit 0;
 		elif [ ! -v flags[$flag] ]; then
+			if [ "${flag:0:1}" = "-" -a "${flag:0:2}" != "--" ]; then
+				declare allBinary=true;
+
+				while IFS= read -r -n 1 f; do
+					if [ ! -v flags["-$f"] -a ! -v aliases["-$f"] ]; then
+						allBinary=false;
+
+						break;
+					fi;
+				done < <(echo -n "${flag:1}");
+
+				if $allBinary; then
+					while IFS= read -r -n 1 f; do
+						declare flag="-$f";
+
+						if [ -v aliases[$flag] ]; then
+							flag="${aliases[$flag]}";
+						fi;
+
+						setFlags["$flag"]="true";
+					done < <(echo -n "${flag:1}");
+
+					continue;
+				fi;
+			fi;
+
 			if $hasAdditional; then
 				args+=( "$flag" );
 
