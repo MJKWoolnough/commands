@@ -291,7 +291,7 @@ __handle_parts() {
 
 	__script > "$script";
 
-	exec {fd} < "$script";
+	exec {fd}< "$script";
 	rm -f "$script";
 
 	mapfile -d '' CMD < <(
