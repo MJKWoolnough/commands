@@ -237,7 +237,13 @@ __handle_parts() {
 				declare allBinary=true;
 
 				while IFS= read -r -n 1 f; do
-					if [ ! -v flags["-$f"] -a ! -v aliases["-$f"] ]; then
+					f="-$f";
+
+					if [ -v aliases["$f"] ]; then
+						f="${aliases[$f]}";
+					fi;
+
+					if [ "${flags["$f"]:-}" != "boolean" ]; then
 						allBinary=false;
 
 						break;
