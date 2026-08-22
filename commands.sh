@@ -42,7 +42,7 @@ commands() {
 }
 
 __description() {
-	__sections | sed -n '/^#/!q; p' | sed -e '1{/^#!/d}' -e 's/^# *//';
+	__sections | sed -n '/^#/!q; 1{/^#!/d}; s/^# *//p';
 }
 
 __flags() {
