@@ -47,8 +47,8 @@ __description() {
 
 __flags() {
 	while read line; do
-		printf "%s\0%s\0%s\0" "$(sed -e 's/  +/ /g' <<< "$line" | cut -d' ' -f2)" "$(sed -e 's/  +/ /g' <<< "$line" | cut -d'#' -f1 | cut -d' ' -f3)" "$(cut -s -d'#' -f2- <<< "$line" | sed -e 's/^ *//')";
-	done < <(__sections | sed -n '1,/^[^#:]/p' | grep "^: ");
+		printf "%s\0%s\0%s\0" "$(sed -e 's/  +/ /g' <<< "$line" | cut -d' ' -f1)" "$(sed -e 's/  +/ /g' <<< "$line" | cut -d'#' -f1 | cut -d' ' -f2)" "$(cut -s -d'#' -f2- <<< "$line" | sed -e 's/^ *//')";
+	done < <(__sections | sed -n '/^#/d; /^: /!q; s/^:  *//p');
 }
 
 __print_flags() {
