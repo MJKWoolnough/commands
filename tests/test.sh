@@ -213,6 +213,9 @@ cat \"\$0\";"
 true
 true
 false"
+  	["14/test.sh abc -abce"]="Error: Unknown flag: -abce
+
+Usage: 14/test.sh [--help] abc [-a] [--big] [-c] [-d] [-e string]"
 );
 
 declare debug=false;

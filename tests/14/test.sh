@@ -9,6 +9,7 @@ commands --;
 : --big,-b boolean
 : -c boolean
 : -d boolean
+: -e [string]
 
 echo "$a";
 echo "$big";
