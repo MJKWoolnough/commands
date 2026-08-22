@@ -209,6 +209,10 @@ cat \"\$0\";"
 
 echo \"456\";
 cat \"\$0\";"
+  	["14/test.sh abc -abc"]="true
+true
+true
+false"
 );
 
 declare debug=false;
