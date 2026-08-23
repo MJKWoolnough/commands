@@ -288,7 +288,7 @@ __handle_parts() {
 
 				exit 2;
 			} >&2;
-		elif [ "${flags[$flag]: -2}" = "##" -a -z "$(grep "^[+-]\?[0-9]*\(\.[0-9]\+\)\?$" <<< "$1")" -o "${flags[$flag]: -1}" = "#" -a "${flags[$flag]: -2}" != "##" -a  -z "$(grep "^[+-]\?[0-9]\+$" <<< "$1")" ]; then
+		elif [ "${flags[$flag]: -2}" = "##" -a -z "$(grep "^[+-]\?[0-9]*\(\.[0-9]\+\)\?$" <<< "$1")" -o "${flags[$flag]: -1}" = "#" -a "${flags[$flag]: -2}" != "##" -a -z "$(grep "^[+-]\?[0-9]\+$" <<< "$1")" ]; then
 			{
 				echo -e "Error: Invalid flag value: $flag "$1"\n";
 				__section_help;
