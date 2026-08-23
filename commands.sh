@@ -47,7 +47,7 @@ __description() {
 
 __flags() {
 	while read line; do
-		printf "%s\0%s\0%s\0" "$(sed -e 's/  +/ /g' <<< "$line" | cut -d' ' -f1)" "$(sed -e 's/  +/ /g' <<< "$line" | cut -d'#' -f1 | cut -s -d' ' -f2)" "$(cut -s -d'#' -f2- <<< "$line" | sed -e 's/^ *//')";
+		printf "%s\0%s\0%s\0" "$(sed -e 's/  \+/ /g' <<< "$line" | cut -d' ' -f1)" "$(sed -e 's/ \+#.*//; s/  +/ /g' <<< "$line" | cut -s -d' ' -f2)" "$(sed -n 's/.* # *//p' <<< "$line")";
 	done < <(__sections | sed -n '/^#/d; /^: /!q; s/^:  *//p');
 }
 
@@ -92,7 +92,7 @@ __usage() {
 		elif [ "${type:0:1}" = "[" -o "$type" = "" ]; then
 			echo -n " [$flag$(__flag_type "${type:-}")]";
 		else
-			printf " %s%s" "$flag" "$(__flag_type "${type:-}")";
+			printf " %s%s" "$flag" "$(__flag_type "$type")";
 		fi;
 	done < <(
 		if [ -n "$part" ]; then
@@ -136,7 +136,7 @@ __help() {
 }
 
 __flag_type() {
-	declare type="$(sed -e 's/^\[\(.*\)\]$/\1/' <<< "$1")";
+	declare type="$(sed -e 's/^\[\(.*\)\]$/\1/; s/#*$//' <<< "$1")";
 
 	if [ "$type" != "" ]; then
 		printf " %s" "$type";
@@ -288,7 +288,7 @@ __handle_parts() {
 
 				exit 2;
 			} >&2;
-		elif [ "${flags[$flag]}" = "number" -a -z "$(grep "^[+-]\?[0-9]*\(\.[0-9]\+\)\?$" <<< "$1")" -o "${flags[$flag]}" = "integer" -a -z "$(grep "^[+-]\?[0-9]\+$" <<< "$1")" ]; then
+		elif [ "${flags[$flag]: -2}" = "##" -a -z "$(grep "^[+-]\?[0-9]*\(\.[0-9]\+\)\?$" <<< "$1")" -o "${flags[$flag]: -1}" = "#" -a "${flags[$flag]: -2}" != "##" -a  -z "$(grep "^[+-]\?[0-9]\+$" <<< "$1")" ]; then
 			{
 				echo -e "Error: Invalid flag value: $flag "$1"\n";
 				__section_help;

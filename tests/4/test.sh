@@ -15,7 +15,7 @@ echo "${another:-BAD}"
 --defgh
 # The second subcommand
 : --flag [string] # First flag
-: --another number # Second flag
+: --another number## # Second flag
 
 echo "${flag:-GOOD}"
 echo "${another:-BAD}"

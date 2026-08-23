@@ -5,6 +5,6 @@
 commands --;
 
 --abc
-: --num integer # A number
+: --num integer# # A number
 
 echo "$num";
