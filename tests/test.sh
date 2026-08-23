@@ -237,6 +237,8 @@ if [ "$1" = "--debug" ]; then
 	debug=true;
 fi;
 
+declare code=0;
+
 for cmd in "${!tests[@]}"; do
 	declare result="$($cmd 2>&1)";
 
@@ -250,5 +252,9 @@ for cmd in "${!tests[@]}"; do
 		echo -e "Got\n---";
 		$debug && xxd <<< "$result" || echo "$result";
 		echo;
+
+		code=1;
 	fi;
 done;
+
+exit $code;
