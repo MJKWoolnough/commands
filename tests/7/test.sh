@@ -4,9 +4,9 @@
 
 func() {
 	declare script="$1";
-	shift
+	shift;
 	echo "Global Func";
-	. "$script" ;
+	. "$script";
 }
 
 commands global abc def;
