@@ -228,6 +228,10 @@ Flags:
   --ver  Second flag"
   	["15/test.sh abc --id 123 --ver 1.1"]="123
 1.1"
+  	["16/test.sh abc --flag 123"]="123"
+  	["16/test.sh abc --flag 123 --flag 456"]="Error: Flag already set: --flag
+
+Usage: 16/test.sh [--help] abc --flag string"
 
 );
 
