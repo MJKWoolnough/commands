@@ -216,6 +216,19 @@ false"
   	["14/test.sh abc -abce"]="Error: Unknown flag: -abce
 
 Usage: 14/test.sh [--help] abc [-a] [--big] [-c] [-d] [-e string]"
+  	["15/test.sh abc --id 123"]="123
+NONE"
+  	["15/test.sh abc --id 123.1"]="Error: Invalid flag value: --id 123.1
+
+Usage: 15/test.sh [--help] abc --id id [--ver version]
+The first subcommand
+
+Flags:
+  --id   First flag
+  --ver  Second flag"
+  	["15/test.sh abc --id 123 --ver 1.1"]="123
+1.1"
+
 );
 
 declare debug=false;
