@@ -295,6 +295,13 @@ __handle_parts() {
 
 				exit 2;
 			} >&2;
+		elif [ -v setFlags["$flag"] ]; then
+			{
+				echo -e "Error: Flag already set: $flag\n";
+				__section_help;
+
+				exit 2;
+			} >&2;
 		else
 			setFlags[$flag]="$1";
 		fi;
