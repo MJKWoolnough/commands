@@ -7,7 +7,7 @@ commands --;
 --abc
 # The first subcommand
 : --flag string # First flag
-: --another boolean # Second flag
+: --another # Second flag
 
 echo "${flag:-BAD}"
 echo "${another:-BAD}"

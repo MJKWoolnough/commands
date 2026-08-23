@@ -5,10 +5,10 @@
 commands --;
 
 --abc
-: -a boolean
-: --big,-b boolean
-: -c boolean
-: -d boolean
+: -a
+: --big,-b
+: -c
+: -d
 : -e [string]
 
 echo "$a";

@@ -47,7 +47,7 @@ __description() {
 
 __flags() {
 	while read line; do
-		printf "%s\0%s\0%s\0" "$(sed -e 's/  +/ /g' <<< "$line" | cut -d' ' -f1)" "$(sed -e 's/  +/ /g' <<< "$line" | cut -d'#' -f1 | cut -d' ' -f2)" "$(cut -s -d'#' -f2- <<< "$line" | sed -e 's/^ *//')";
+		printf "%s\0%s\0%s\0" "$(sed -e 's/  +/ /g' <<< "$line" | cut -d' ' -f1)" "$(sed -e 's/  +/ /g' <<< "$line" | cut -d'#' -f1 | cut -s -d' ' -f2)" "$(cut -s -d'#' -f2- <<< "$line" | sed -e 's/^ *//')";
 	done < <(__sections | sed -n '/^#/d; /^: /!q; s/^:  *//p');
 }
 
@@ -89,10 +89,10 @@ __usage() {
 		if [ "$flag" = "..." -o "$flag" = "…" ]; then
 			additional=true;
 			additionalDesc="$desc";
-		elif [ "${type:0:1}" = "[" -o "$type" = "boolean" ]; then
-			echo -n " [$flag$(__flag_type "${type:-value}")]";
+		elif [ "${type:0:1}" = "[" -o "$type" = "" ]; then
+			echo -n " [$flag$(__flag_type "${type:-}")]";
 		else
-			printf " %s%s" "$flag" "$(__flag_type "${type:-value}")";
+			printf " %s%s" "$flag" "$(__flag_type "${type:-}")";
 		fi;
 	done < <(
 		if [ -n "$part" ]; then
@@ -138,7 +138,7 @@ __help() {
 __flag_type() {
 	declare type="$(sed -e 's/^\[\(.*\)\]$/\1/' <<< "$1")";
 
-	if [ "$type" != "boolean" ]; then
+	if [ "$type" != "" ]; then
 		printf " %s" "$type";
 	fi;
 }
@@ -206,7 +206,7 @@ __handle_parts() {
 
 		if [ "$flag" = "..." -o "$flag" = "…" ]; then
 			hasAdditional=true;
-		elif [ "$type" = "boolean" ]; then
+		elif [ "$type" = "" ]; then
 			setFlags[$flag]="false";
 			flags[$flag]="$type";
 		elif [ "${type:0:1}" = "[" -a "${type: -1}" = "]" ]; then
@@ -243,7 +243,7 @@ __handle_parts() {
 						f="${aliases[$f]}";
 					fi;
 
-					if [ "${flags["$f"]:-}" != "boolean" ]; then
+					if [ "${flags["$f"]-!}" != "" ]; then
 						allBinary=false;
 
 						break;
@@ -279,7 +279,7 @@ __handle_parts() {
 			fi;
 		fi;
 
-		if [ "${flags[$flag]}" = "boolean" ]; then
+		if [ "${flags[$flag]}" = "" ]; then
 			setFlags[$flag]="true";
 		elif [ $# -eq 0 ]; then
 			{
