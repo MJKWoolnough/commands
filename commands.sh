@@ -155,7 +155,7 @@ __section_help() {
 
 __bind_flags() {
 	for flag in "${!setFlags[@]}"; do
-			echo "declare -g $(tr -d '-' <<< "$flag")=${setFlags[$flag]@Q}";
+		echo "declare -g $(tr -d '-' <<< "$flag")=${setFlags[$flag]@Q}";
 	done;
 
 	for flag in "${!arrays[@]}"; do
@@ -271,7 +271,7 @@ __handle_parts() {
 						fi;
 
 						if [ -v arrays["$flag"] ]; then
-							arrays["$flag"]="${arrays[$flag]} true" ;
+							arrays["$flag"]="${arrays[$flag]} true";
 						else
 							setFlags[$flag]="true";
 						fi;
@@ -297,7 +297,7 @@ __handle_parts() {
 
 		if [ "${flags[$flag]}" = "" ]; then
 			if [ -v arrays["$flag"] ]; then
-				arrays["$flag"]="${arrays[$flag]} true" ;
+				arrays["$flag"]="${arrays[$flag]} true";
 			else
 				setFlags[$flag]="true";
 			fi;
@@ -318,7 +318,7 @@ __handle_parts() {
 				exit 2;
 			} >&2;
 		elif [ -v arrays["$flag"] ]; then
-			arrays["$flag"]="${arrays[$flag]} ${1@Q}" ;
+			arrays["$flag"]="${arrays[$flag]} ${1@Q}";
 		elif [ -v setFlags["$flag"] ]; then
 			{
 				echo -e "Error: Flag already set: $flag\n";
