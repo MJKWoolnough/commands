@@ -232,6 +232,26 @@ Flags:
   	["16/test.sh abc --flag 123 --flag 456"]="Error: Flag already set: --flag
 
 Usage: 16/test.sh [--help] abc --flag string"
+  	["17/test.sh abc --help"]="Usage: 17/test.sh [--help] abc [--flag string]... [--another]...
+The first subcommand
+
+Flags:
+  --flag        First flag
+  --another,-a  Second flag"
+
+  	["17/test.sh abc"]="
+NONE
+NONE
+0"
+	["17/test.sh abc --flag a --flag b --another --another --another"]="a b
+a
+true
+3"
+
+	["17/test.sh abc --flag a -aaa --another --another"]="a
+a
+true
+5"
 
 );
 
