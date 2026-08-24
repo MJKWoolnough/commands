@@ -71,3 +71,40 @@ If a flag type ends in two hashes, the flag value will be checked as a float; ag
 If a flag is surrounded by '[' and ']' that flag is treated as optional, and will be unset in the generated script.
 
 The type string itself is otherwise arbitrary and should be used for documentation purposes.
+
+## Examples
+
+### Single script
+
+```bash
+#!/bin/bash
+# Print IDs.
+: --json,-j       # Print as JSON
+: --id id#        # Numeric ID
+: --desc [string] # An optional description
+
+. ./commands.sh;
+
+commands;
+
+if $json; then
+	echo "ID: $id"
+	[ -n "$desc" ] && echo "Description: $desc";
+else
+	echo -n "{\"id\": \"$id\""
+	[ -n "$desc" ] && echo " ,\"description\": $(printf "%q" "$desc")";
+	echo "}";
+fi;
+```
+
+The commands call in the above script will parse the specified flags and validate them from the arguments given to the script. On an error, or if `--help` is specified, the following help text will be generated:
+
+```
+Usage: ./example.sh [--help] [--json] --id id [--desc string]
+Print IDs.
+
+Flags:
+  --json,-j  Print as JSON
+  --id       Numeric ID
+  --desc     An optional description
+```
