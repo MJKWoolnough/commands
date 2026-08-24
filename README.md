@@ -108,3 +108,28 @@ Flags:
   --id       Numeric ID
   --desc     An optional description
 ```
+
+### Multiple Subcommands in a Single Script
+
+```bash
+#!/bin/bash
+
+. ./commands.sh;
+
+commands "##";
+
+##
+# A collection of simple scripts for managing a service.
+: --service name # Name of service to manage
+
+##restart
+# Restart the named service
+: --when [string] # Time/Date to restart the service; defaults to now.
+
+restart_service "$service" "${when:-now}";
+
+##update
+# Update the named service
+
+run_update "$service";
+```
