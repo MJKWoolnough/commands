@@ -68,7 +68,9 @@ If a flag type ends in a hash, the flag value will be checked as an integer, thr
 
 If a flag type ends in two hashes, the flag value will be checked as a float; again, throwing an error on a mismatch.
 
-If a flag is surrounded by '[' and ']' that flag is treated as optional, and will be unset in the generated script.
+If a flag is surrounded by '[' and ']' that flag is treated as optional, and will be unset in the generated script if not specified.
+
+If a flag ends in '[]' the flag will be parsed as an array. Each time the flag is specified its value gets added as a new item to that array.
 
 The type string itself is otherwise arbitrary and should be used for documentation purposes.
 
