@@ -89,8 +89,12 @@ __usage() {
 		if [ "$flag" = "..." -o "$flag" = "…" ]; then
 			additional=true;
 			additionalDesc="$desc";
-		elif [ "${type:0:1}" = "[" -o "$type" = "" ]; then
+		elif [ "${type: -1}" = "]" -o "$type" = "" ]; then
 			echo -n " [$flag$(__flag_type "${type:-}")]";
+
+			if [ "${type: -2}" = "[]" ]; then
+				echo -n "...";
+			fi;
 		else
 			printf " %s%s" "$flag" "$(__flag_type "$type")";
 		fi;
@@ -136,7 +140,7 @@ __help() {
 }
 
 __flag_type() {
-	declare type="$(sed -e 's/^\[\(.*\)\]$/\1/; s/#*$//' <<< "$1")";
+	declare type="$(sed -e 's/\[\]$//; s/^\[\(.*\)\]$/\1/; s/#*$//' <<< "$1")";
 
 	if [ "$type" != "" ]; then
 		printf " %s" "$type";
@@ -151,7 +155,11 @@ __section_help() {
 
 __bind_flags() {
 	for flag in "${!setFlags[@]}"; do
-		echo "declare -g $(tr -d '-' <<< "$flag")=${setFlags[$flag]@Q}";
+			echo "declare -g $(tr -d '-' <<< "$flag")=${setFlags[$flag]@Q}";
+	done;
+
+	for flag in "${!arrays[@]}"; do
+		echo "declare -g -a $(tr -d '-' <<< "$flag")=${arrays[$flag]} )";
 	done;
 }
 
@@ -190,6 +198,7 @@ __handle_parts() {
 	shift;
 	declare -A flags=();
 	declare -A required=();
+	declare -A arrays=();
 	declare -A setFlags=();
 	declare -A aliases=();
 	declare -a args=();
@@ -209,6 +218,9 @@ __handle_parts() {
 		elif [ "$type" = "" ]; then
 			setFlags[$flag]="false";
 			flags[$flag]="$type";
+		elif [ "${type: -2}" = "[]" ]; then
+			arrays[$flag]="(";
+			flags[$flag]="${type:0:-2}";
 		elif [ "${type:0:1}" = "[" -a "${type: -1}" = "]" ]; then
 			flags[$flag]="${type:1:-1}";
 		else
@@ -258,7 +270,11 @@ __handle_parts() {
 							flag="${aliases[$flag]}";
 						fi;
 
-						setFlags["$flag"]="true";
+						if [ -v arrays["$flag"] ]; then
+							arrays["$flag"]="${arrays[$flag]} true" ;
+						else
+							setFlags[$flag]="true";
+						fi;
 					done < <(echo -n "${flag:1}");
 
 					continue;
@@ -280,7 +296,13 @@ __handle_parts() {
 		fi;
 
 		if [ "${flags[$flag]}" = "" ]; then
-			setFlags[$flag]="true";
+			if [ -v arrays["$flag"] ]; then
+				arrays["$flag"]="${arrays[$flag]} true" ;
+			else
+				setFlags[$flag]="true";
+			fi;
+
+			continue;
 		elif [ $# -eq 0 ]; then
 			{
 				echo -e "Error: Flag requires value: $flag\n";
@@ -295,6 +317,8 @@ __handle_parts() {
 
 				exit 2;
 			} >&2;
+		elif [ -v arrays["$flag"] ]; then
+			arrays["$flag"]="${arrays[$flag]} ${1@Q}" ;
 		elif [ -v setFlags["$flag"] ]; then
 			{
 				echo -e "Error: Flag already set: $flag\n";
