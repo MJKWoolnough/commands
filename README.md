@@ -133,3 +133,39 @@ restart_service "$service" "${when:-now}";
 
 run_update "$service";
 ```
+
+### Multiple Subcommands in a Multiple Files
+
+`service.sh`:
+
+```bash
+#!/bin/bash
+
+. ./commands.sh;
+
+commands global restart update;
+```
+
+`global`:
+
+```bash
+# A collection of simple scripts for managing a service.
+: --service name # Name of service to manage
+```
+
+`restart`:
+
+```bash
+# Restart the named service
+: --when [string] # Time/Date to restart the service; defaults to now.
+
+restart_service "$service" "${when:-now}";
+```
+
+`update`:
+
+```bash
+# Update the named service
+
+run_update "$service";
+```
