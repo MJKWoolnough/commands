@@ -252,6 +252,16 @@ true
 a
 true
 5"
+	["18/test.sh --id 1 --id 20 --id 99"]="ID: 1
+ID: 20
+ID: 99"
+	["18/test.sh --id 1 --id 20 --id bad"]="Error: Invalid flag value: --id bad
+
+Usage: 18/test.sh [--help]  [--id id]...
+List IDs
+
+Flags:
+  --id  ID"
 
 );
 
