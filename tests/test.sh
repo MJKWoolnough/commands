@@ -262,6 +262,12 @@ List IDs
 
 Flags:
   --id  ID"
+	["19/test.sh --help"]="Usage: 19/test.sh [--help]  [--flag string]
+
+Flags:
+  --flag  Default: ABC"
+	["19/test.sh"]="ABC"
+	["19/test.sh --flag DEF"]="DEF"
 
 );
 
