@@ -70,7 +70,13 @@ __print_flags() {
 
 		while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
 			if [ -n "$desc" -a "$flag" != "..." -a "$flag" != "…" ]; then
-				printf "  %-${maxLength}s${desc:+  }%s\n" "$flag" "$desc";
+				printf "  %-${maxLength}s" "$flag"
+
+				if [ -n "$desc" ]; then
+					echo -n " ";
+					eval "printf ' %s' $desc";
+					echo;
+				fi;
 			fi;
 		done < <(__flags);
 	fi;
