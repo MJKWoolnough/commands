@@ -350,7 +350,7 @@ __handle_parts() {
 		return 0;
 	fi;
 
-	declare script="$(mktemp --tmpdir=/dev/shm)";
+	declare script="$(mktemp --tmpdir=/dev/shm 2> /dev/null || mktemp)";
 
 	{
 		__bind_flags;
