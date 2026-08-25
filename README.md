@@ -43,8 +43,6 @@ Multiple command description lines can be used as long as they're one after the 
 
 Each subcommand can have its own description which is printed both as part of that subcommands help text and as part of the global help text.
 
-A description at the top 
-
 ### Flags
 
 Likewise, multiple flags can be specified one after the other; the description for a flag is optional.
