@@ -9,7 +9,7 @@ The command library provides a simple way to specify flags and subcommands for b
  - Ability to specify required or optional flags with basic type checking.
  - Auto-generates usage and help text.
  - Subcommands allowing for isolation of code.
-   - Each subcommand can specify its own shebang.
+   - Each subcommand can specify its own shebang, which can be a complex command or a function.
    - Subcommands can be inline, all within a single bash script, or in separate files.
    - Global flags that apply to all subcommands, and subcommand specific flags.
    - Global code that is shared between all subcommands.
