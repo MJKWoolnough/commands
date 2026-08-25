@@ -53,6 +53,8 @@ To read the value of a flag, the first flag name is stripped of prefixed dashes 
 
 The ... argument indicates that the command can accept additional, non-flag arguments. These arguments will be passed to the script via the normal command parameters ($1, $2, $3, etc.).
 
+Any flag description is evaluated such that $vars are correctly handled. This allows for environmental variables to be added as defaults, for example.
+
 #### Types
 
 If a flag specifies no type string, that flag is treated as a boolean flag; optional and does not process any value, just setting the flag var to `true` if set. Multiple, single-dash boolean flags can be specified as a combined flag:
