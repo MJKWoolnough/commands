@@ -8,7 +8,7 @@ commands() {
 		declare solo=1;
 		declare part="";
 
-		__args=( "$part" "${__args[@]}" );
+		__args=( "" "${__args[@]}" );
 
 		eval "__parts() { [ -n \"\$part\" ] && echo ${part@Q}; }; __sections() { [ -n \"\$part\" ] && cat ${0@Q}; }";;
 	1)
@@ -167,12 +167,6 @@ __bind_flags() {
 	for flag in "${!arrays[@]}"; do
 		echo "declare -g -a $(tr -d '-' <<< "$flag")=${arrays[$flag]} )";
 	done;
-}
-
-__script() {
-	__bind_flags;
-	part="" __sections;
-	__sections;
 }
 
 __handle_parts() {
@@ -358,7 +352,11 @@ __handle_parts() {
 
 	declare script="$(mktemp --tmpdir=/dev/shm)";
 
-	__script > "$script";
+	{
+		__bind_flags;
+		part="" __sections;
+		__sections;
+	} > "$script";
 
 	exec {fd}< "$script";
 	rm -f "$script";
