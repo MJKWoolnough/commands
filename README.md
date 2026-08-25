@@ -24,6 +24,7 @@ All three share the same syntax for specifying command descriptions and flags:
 #!shebang-command
 # Description of my command 
 : --flag type # Description of my flag
+: ... # Additional args
 ```
 
 ### Shebang
@@ -51,6 +52,8 @@ Likewise, multiple flags can be specified one after the other; the description f
 For the `--flag`, this is a comma separated set of flags that all correspond to the same setting.
 
 To read the value of a flag, the first flag name is stripped of prefixed dashes and that is set to the value given to the flag.
+
+The ... argument indicates that the command can accept additional, non-flag arguments. These arguments will be passed to the script via the normal command parameters ($1, $2, $3, etc.).
 
 #### Types
 
