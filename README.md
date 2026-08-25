@@ -33,7 +33,7 @@ The shebang will be the command executed and provided a path to the generated sc
 
 Unlike a normal shebang, it can contain any number of additional arguments which will be specified before the script path.
 
-If a shebang isn't specified, then bash will be used, unless a shebang is specified in a 'global' script, in which case that one will be used.
+If a shebang isn't specified, then $BASH will be used, unless a shebang is specified in a 'global' script, in which case that one will be used.
 
 NB: This is only handled for subcommands; when no subcommands are set execution simple continues after the `commands` call.
 
