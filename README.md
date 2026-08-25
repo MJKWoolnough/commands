@@ -1,6 +1,6 @@
 # commands
 
-[![CI](https://github.com/MJKWoolnough/commands/actions/workflows/go-checks.yml/badge.svg)](https://github.com/MJKWoolnough/commands/actions)
+[![CI](https://github.com/MJKWoolnough/commands/actions/workflows/tests.yml/badge.svg)](https://github.com/MJKWoolnough/commands/actions)
 
 The command library provides a simple way to specify flags and subcommands for bash scripts.
 
