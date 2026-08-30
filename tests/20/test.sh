@@ -8,6 +8,7 @@ commands "--";
 
 --abc
 : --flag [string]
+: --flbg number
 
 --def
 : --flag2 [string

@@ -287,6 +287,10 @@ Flags:
 	["completions 20/test.sh 1"]="abc def"
 	["completions 20/test.sh 1 a"]="abc"
 	["completions 20/test.sh 1 d"]="def"
+	["completions 20/test.sh 2 abc --"]="--flag --flbg"
+	["completions 20/test.sh 2 abc --fla"]="--flag"
+	["completions 20/test.sh 2 abc --flb"]="--flbg"
+	["completions 20/test.sh 2 def"]="--flag2"
 );
 
 declare debug=false;
