@@ -8,9 +8,11 @@ commands() {
 		declare solo=1;
 		declare part="";
 
-		__args=( "" "${__args[@]}" );
+		if [ "${__args[0]:-}" != "--completions" ]; then
+			__args=( "$part" "${__args[@]}" );
+		fi;
 
-		eval "__parts() { [ -n \"\$part\" ] && echo ${part@Q}; }; __sections() { [ -n \"\$part\" ] && cat ${0@Q}; }";;
+		eval "__parts() { [ -n \"\$part\" ] && echo -e ${part@Q}; }; __sections() { [ -n \"\$part\" ] && cat ${0@Q}; }";;
 	1)
 		declare start="${1:?Start string required}";
 
@@ -49,6 +51,18 @@ __flags() {
 	while read line; do
 		printf "%s\0%s\0%s\0" "$(sed -e 's/  \+/ /g; s/^\([^ ]*\).*/\1/' <<< "$line")" "$(sed -e 's/ \+#.*//; s/  +/ /g' <<< "$line" | cut -s -d' ' -f2)" "$(sed -n 's/.* # *//p' <<< "$line")";
 	done < <(__sections | sed -n '/^#/d; /^: /!q; s/^:  *//p');
+}
+
+__completions() {
+	cat <<HEREDOC
+__do_completion() {
+	if [ \$COMP_CWORD -eq 1 ]; then
+		COMPREPLY=( \$(compgen -W "$(__parts | xargs printf "%q ")" "\${COMP_WORDS[1]}" | xargs printf "%q ") );
+	fi;
+}
+
+complete -F __do_completion ${0@Q};
+HEREDOC
 }
 
 __print_flags() {
@@ -172,6 +186,10 @@ __bind_flags() {
 __handle_parts() {
 	if [ "${1:-}" = "--help" ]; then
 		__help;
+
+		exit 0;
+	elif [ "${1:-}" = "--completions" ]; then
+		__completions;
 
 		exit 0;
 	fi;
