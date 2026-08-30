@@ -70,18 +70,18 @@ $fn() {
 
 		case "\${COMP_WORDS[1]}" in
 $(
-			while read part; do
-				echo "		$part)";
+	while read part; do
+		echo "		$part)";
 
-				while read -r -d '' flag && read -r -d '' type && read -r -d ''; do
-					if [ "$flag" = "..." -o "$flag" = "…" ]; then
-						echo "			hasExtra=true;"
-					else
-						echo "			flags+=( ${flag@Q} );";
-					fi;
-				done < <(__flags);
-				echo "			:;;";
-			done < <(__parts);
+		while read -r -d '' flag && read -r -d '' type && read -r -d ''; do
+			if [ "$flag" = "..." -o "$flag" = "…" ]; then
+				echo "			hasExtra=true;";
+			else
+				echo "			flags+=( ${flag@Q} );";
+			fi;
+		done < <(__flags);
+		echo "			:;;";
+	done < <(__parts);
 )
 		esac;
 
@@ -112,7 +112,7 @@ __print_flags() {
 
 		while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
 			if [ -n "$desc" -a "$flag" != "..." -a "$flag" != "…" ]; then
-				printf "  %-${maxLength}s" "$flag"
+				printf "  %-${maxLength}s" "$flag";
 
 				if [ -n "$desc" ]; then
 					echo -n " ";
