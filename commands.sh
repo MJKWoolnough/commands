@@ -54,11 +54,41 @@ __flags() {
 }
 
 __completions() {
+	# COMP_WORDS
+	# COMP_CWORD
+	# COMPLINE
+	# COMPREPLY
+
 	cat <<HEREDOC
 __do_completion() {
 	if [ \$COMP_CWORD -eq 1 ]; then
 		COMPREPLY=( \$(compgen -W "$(__parts | xargs printf "%q ")" "\${COMP_WORDS[1]}" | xargs printf "%q ") );
+
+		return 0;
 	fi;
+
+	declare -a flags=();
+	declare hasExtra=false;
+
+	case "\${COMP_WORDS[1]}" in
+$(
+		while read part; do
+			echo "	$part)";
+			
+			while read -r -d '' flag && read -r -d '' type && read -r -d ''; do
+				if [ "$flag" = "..." -o "$flag" = "…" ]; then
+					echo "		hasExtra=true;"
+				else
+					echo "		flags+=( ${flag@Q} );";
+				fi;
+			done < <(__flags);
+			echo "		:;;";
+		done < <(__parts);
+	)
+	esac;
+	
+
+	COMPREPLY=( \$(compgen -W "\${flags[*]}" -- "\${COMP_WORDS[\$COMP_CWORD]}" | xargs printf "%q ") );
 }
 
 complete -F __do_completion ${0@Q};
