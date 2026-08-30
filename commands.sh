@@ -64,31 +64,29 @@ __completions() {
 $fn() {
 	if [ \$COMP_CWORD -eq 1 ]; then
 		compgen -V COMPREPLY -W "$(__parts | xargs printf "%q ")" "\${COMP_WORDS[1]}";
+	else
+		declare -a flags=();
+		declare hasExtra=false;
 
-		return 0;
-	fi;
-
-	declare -a flags=();
-	declare hasExtra=false;
-
-	case "\${COMP_WORDS[1]}" in
+		case "\${COMP_WORDS[1]}" in
 $(
-		while read part; do
-			echo "	$part)";
-			
-			while read -r -d '' flag && read -r -d '' type && read -r -d ''; do
-				if [ "$flag" = "..." -o "$flag" = "…" ]; then
-					echo "		hasExtra=true;"
-				else
-					echo "		flags+=( ${flag@Q} );";
-				fi;
-			done < <(__flags);
-			echo "		:;;";
-		done < <(__parts);
-	)
-	esac;
-	
-	compgen -V COMPREPLY -W "\${flags[*]}" -- "\${COMP_WORDS[\$COMP_CWORD]}";
+			while read part; do
+				echo "		$part)";
+
+				while read -r -d '' flag && read -r -d '' type && read -r -d ''; do
+					if [ "$flag" = "..." -o "$flag" = "…" ]; then
+						echo "			hasExtra=true;"
+					else
+						echo "			flags+=( ${flag@Q} );";
+					fi;
+				done < <(__flags);
+				echo "			:;;";
+			done < <(__parts);
+)
+		esac;
+
+		compgen -V COMPREPLY -W "\${flags[*]}" -- "\${COMP_WORDS[\$COMP_CWORD]}";
+	fi;
 }
 
 complete -F "$fn" ${0@Q};
