@@ -62,7 +62,7 @@ __completions() {
 	cat <<HEREDOC
 __do_completion() {
 	if [ \$COMP_CWORD -eq 1 ]; then
-		COMPREPLY=( \$(compgen -W "$(__parts | xargs printf "%q ")" "\${COMP_WORDS[1]}" | xargs printf "%q ") );
+		compgen -V COMPREPLY -W "$(__parts | xargs printf "%q ")" "\${COMP_WORDS[1]}";
 
 		return 0;
 	fi;
@@ -87,8 +87,7 @@ $(
 	)
 	esac;
 	
-
-	COMPREPLY=( \$(compgen -W "\${flags[*]}" -- "\${COMP_WORDS[\$COMP_CWORD]}" | xargs printf "%q ") );
+	compgen -V COMPREPLY -W "\${flags[*]}" -- "\${COMP_WORDS[\$COMP_CWORD]}";
 }
 
 complete -F __do_completion ${0@Q};
