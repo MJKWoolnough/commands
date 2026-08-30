@@ -13,7 +13,7 @@ completions() {
 
 	. <("$CMD" --completions);
 
-	__do_completion;
+	"$(declare -F | grep __do_completion | cut -d' ' -f3)";
 
 	echo "${COMPREPLY[@]}";
 }
