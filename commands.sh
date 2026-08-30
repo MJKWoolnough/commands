@@ -54,13 +54,14 @@ __flags() {
 }
 
 __completions() {
-	# COMP_WORDS
-	# COMP_CWORD
-	# COMPLINE
-	# COMPREPLY
+	declare fn="__completions";
+
+	while declare -F "$fn" > /dev/null; do
+		fn="__do_completion_$RANDOM";
+	done;
 
 	cat <<HEREDOC
-__do_completion() {
+$fn() {
 	if [ \$COMP_CWORD -eq 1 ]; then
 		compgen -V COMPREPLY -W "$(__parts | xargs printf "%q ")" "\${COMP_WORDS[1]}";
 
@@ -90,7 +91,7 @@ $(
 	compgen -V COMPREPLY -W "\${flags[*]}" -- "\${COMP_WORDS[\$COMP_CWORD]}";
 }
 
-complete -F __do_completion ${0@Q};
+complete -F "$fn" ${0@Q};
 HEREDOC
 }
 
