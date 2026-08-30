@@ -2,6 +2,22 @@
 
 cd "$(dirname "$0")";
 
+completions() {
+	declare CMD="$1";
+	declare COMP_CWORD="$2";
+	shift 2;
+	declare -a COMP_WORDS=( "$CMD" "$@" );
+	declare COMP_LINE="$@";
+
+	declare -a COMPREPLY;
+
+	. <("$CMD" --completions);
+
+	__do_completion;
+
+	echo "${COMPREPLY[@]}";
+}
+
 declare -A tests=(
 	["1/test.sh"]="Error: Subcommand required
 
@@ -268,7 +284,6 @@ Flags:
   --flag  Default: ABC"
 	["19/test.sh"]="ABC"
 	["19/test.sh --flag DEF"]="DEF"
-
 );
 
 declare debug=false;
