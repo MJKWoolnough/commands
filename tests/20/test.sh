@@ -11,4 +11,4 @@ commands "--";
 : --flbg number
 
 --def
-: --flag2 [string
+: --flag2 [string]
