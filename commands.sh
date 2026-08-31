@@ -63,19 +63,36 @@ __completions() {
 
 	cat <<HEREDOC
 $fn() {
-	declare -a opts=();
-	declare hasExtra="";
+	$(
+		declare hasExtra=false;
+		echo -n "declare -a opts=( ";
+
+		while read -r -d '' flag && read -r -d '' type && read -r -d ''; do
+			if [ "$flag" = "..." -o "$flag" = "…" ]; then
+				hasExtra=true;
+			else
+				echo -n "${flag@Q} ";
+			fi;
+		done < <(__flags);
+
+		echo ");";
+
+		echo "	declare hasExtra=\"$(
+			if $hasExtra; then
+				echo "-f";
+			fi
+		)\";";
+	)
 
 	if [ \$COMP_CWORD -eq 1 ]; then
 		opts=( $(while read part; do echo -n "${part@Q} "; done < <(__parts)));
 	else
 		case "\${COMP_WORDS[1]}" in
 $(
-
 	declare hasExtra=false;
 
 	while read part; do
-		echo -en "		${part@Q})\n			opts=( ";
+		echo -en "		${part@Q})\n			opts+=( ";
 
 		while read -r -d '' flag && read -r -d '' type && read -r -d ''; do
 			if [ "$flag" = "..." -o "$flag" = "…" ]; then
