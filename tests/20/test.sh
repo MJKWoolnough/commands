@@ -12,4 +12,3 @@ commands "--";
 
 --def
 : --flag2 [string
-: ...

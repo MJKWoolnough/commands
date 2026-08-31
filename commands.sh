@@ -64,18 +64,18 @@ __completions() {
 	cat <<HEREDOC
 $fn() {
 	declare -a opts=();
+	declare hasExtra="";
 
 	if [ \$COMP_CWORD -eq 1 ]; then
 		opts=( $(while read part; do echo -n "${part@Q} "; done < <(__parts)));
 	else
-		declare hasExtra=false;
-
 		case "\${COMP_WORDS[1]}" in
 $(
+
+	declare hasExtra=false;
+
 	while read part; do
 		echo -en "		${part@Q})\n			opts=( ";
-
-		declare hasExtra=false;
 
 		while read -r -d '' flag && read -r -d '' type && read -r -d ''; do
 			if [ "$flag" = "..." -o "$flag" = "…" ]; then
@@ -87,7 +87,7 @@ $(
 		echo -n ");";
 
 		if $hasExtra; then
-			echo -en "\n			hasExtra=true;";
+			echo -en "\n			hasExtra=\"-f\";";
 		fi;
 
 		echo ";";
@@ -96,7 +96,7 @@ $(
 		esac;
 	fi;
 
-	$($hasV || echo -n "read -d '\n' -a COMPREPLY < <(")compgen$($hasV && echo -n " -V COMPREPLY" || true) -W "\${opts[*]}" -- "\${COMP_WORDS[\$COMP_CWORD]}"$($hasV || echo -n ")");
+	$($hasV || echo -n "read -d '\n' -a COMPREPLY < <(")compgen$($hasV && echo -n " -V COMPREPLY" || true) -W "\${opts[*]}" \${hasExtra:---}\${hasExtra:+ --} "\${COMP_WORDS[\$COMP_CWORD]}"$($hasV || echo -n ")");
 }
 
 complete -F "$fn" ${0@Q};
