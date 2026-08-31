@@ -13,7 +13,19 @@ completions() {
 
 	. <("$CMD" --completions);
 
+	declare tmpDir="$(mktemp -d)";
+
+	trap "rm -rf ${tmpDir@Q}" EXIT;
+
+	cd "$tmpDir";
+	touch "$tmpDir/aFile";
+	touch "$tmpDir/bFile";
+	touch "$tmpDir/zFile";
+
 	"$(declare -F | grep __do_completion | cut -d' ' -f3)";
+
+	cd - > /dev/null;
+	rm -rf "$tmpDir";
 
 	echo "${COMPREPLY[@]}";
 }
