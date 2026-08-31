@@ -115,7 +115,7 @@ $(
 
 	$($hasV || echo -n "read -d '\n' -a COMPREPLY < <(")compgen$($hasV && echo -n " -V COMPREPLY" || true) -W "\${opts[*]}" \${hasExtra:---}\${hasExtra:+ --} "\${COMP_WORDS[\$COMP_CWORD]}"$($hasV || echo -n ")");
 
-	readarray -t COMPREPLY < <(printf '%s\n' "\${COMPREPLY[@]}" | sort);
+	readarray -t COMPREPLY < <(printf '%s\n' "\${COMPREPLY[@]}" | LC_ALL=C sort);
 }
 
 complete -F "$fn" ${0@Q};
