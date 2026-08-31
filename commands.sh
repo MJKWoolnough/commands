@@ -54,6 +54,7 @@ __flags() {
 }
 
 __completions() {
+	declare hasV="$(compgen -V var -W "a" "" && echo true || echo false)";
 	declare fn="__completions";
 
 	while declare -F "$fn" > /dev/null; do
@@ -62,10 +63,11 @@ __completions() {
 
 	cat <<HEREDOC
 $fn() {
+	declare -a opts=();
+
 	if [ \$COMP_CWORD -eq 1 ]; then
-		compgen -V COMPREPLY -W "$(__parts | xargs printf "%q ")" "\${COMP_WORDS[1]}";
+		opts=( $(while read part; do echo -n "${part@Q} "; done < <(__parts)));
 	else
-		declare -a flags=();
 		declare hasExtra=false;
 
 		case "\${COMP_WORDS[1]}" in
@@ -77,16 +79,16 @@ $(
 			if [ "$flag" = "..." -o "$flag" = "…" ]; then
 				echo "			hasExtra=true;";
 			else
-				echo "			flags+=( ${flag@Q} );";
+				echo "			opts+=( ${flag@Q} );";
 			fi;
 		done < <(__flags);
 		echo "			:;;";
 	done < <(__parts);
 )
 		esac;
-
-		compgen -V COMPREPLY -W "\${flags[*]}" -- "\${COMP_WORDS[\$COMP_CWORD]}";
 	fi;
+
+	$($hasV || echo -n "read -d '\n' -a COMPREPLY < <(")compgen$($hasV && echo -n " -V COMPREPLY" || true) -W "\${opts[*]}" -- "\${COMP_WORDS[\$COMP_CWORD]}"$($hasV || echo -n ")");
 }
 
 complete -F "$fn" ${0@Q};
