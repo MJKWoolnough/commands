@@ -73,16 +73,24 @@ $fn() {
 		case "\${COMP_WORDS[1]}" in
 $(
 	while read part; do
-		echo "		$part)";
+		echo -en "		${part@Q})\n			opts=( ";
+
+		declare hasExtra=false;
 
 		while read -r -d '' flag && read -r -d '' type && read -r -d ''; do
 			if [ "$flag" = "..." -o "$flag" = "…" ]; then
-				echo "			hasExtra=true;";
+				hasExtra=true;
 			else
-				echo "			opts+=( ${flag@Q} );";
+				echo -n "${flag@Q} ";
 			fi;
 		done < <(__flags);
-		echo "			:;;";
+		echo -n ");";
+
+		if $hasExtra; then
+			echo -en "\n			hasExtra=true;";
+		fi;
+
+		echo ";";
 	done < <(__parts);
 )
 		esac;
