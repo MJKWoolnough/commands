@@ -8,12 +8,10 @@ completions() {
 	shift 2;
 	declare -a COMP_WORDS=( "$CMD" "$@" );
 	declare COMP_LINE="$@";
-
 	declare -a COMPREPLY;
+	declare tmpDir="$(mktemp -d)";
 
 	. <("$CMD" --completions);
-
-	declare tmpDir="$(mktemp -d)";
 
 	trap "rm -rf ${tmpDir@Q}" EXIT;
 
