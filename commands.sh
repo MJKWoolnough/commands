@@ -56,16 +56,20 @@ __flags() {
 __completions() {
 	declare hasV="$(compgen -V var -W "a" "" &> /dev/null && echo true || echo false)";
 	declare fn="__completions";
+	declare hasExtra=false;
 
 	while declare -F "$fn" > /dev/null; do
 		fn="__do_completion_$RANDOM";
 	done;
 
-	cat <<HEREDOC
-$fn() {
-	$(
-	declare hasExtra=false;
-	echo -n "declare -a opts=( ";
+	echo "$fn() {";
+	echo -e "\tdeclare -a opts=();\n\tdeclare hasExtra=\"\";\n";
+	
+	echo -en "\tif [ \$COMP_CWORD -eq 1 ]; then\n\t\topts=( ";
+	while read part; do
+		echo -n "${part@Q} ";
+	done < <(__parts);
+	echo -en ");\n\telse\n\t\topts=( ";
 
 	while read -r -d '' flag && read -r -d '' type && read -r -d ''; do
 		if [ "$flag" = "..." -o "$flag" = "…" ]; then
@@ -77,53 +81,43 @@ $fn() {
 
 	echo ");";
 
-	echo "	declare hasExtra=\"$(
-		if $hasExtra; then
-			echo "-f";
-		fi;
-	)\";";
-)
+	echo -en "\t\thasExtra=\"";
+	if $hasExtra; then
+		echo -n "-f";
+	fi;
+	echo -e "\";\n";
 
-	if [ \$COMP_CWORD -eq 1 ]; then
-		opts=( $(
-	while read part; do
-		echo -n "${part@Q} ";
-	done < <(__parts);
-));
-	else
-		case "\${COMP_WORDS[1]}" in
-$(
-	declare hasExtra=false;
+	echo -e "\t\tcase \"\${COMP_WORDS[1]}\" in";
 
 	while read part; do
+		declare subHasExtra=false;
+
 		echo -en "		${part@Q})\n			opts+=( ";
 
 		while read -r -d '' flag && read -r -d '' type && read -r -d ''; do
 			if [ "$flag" = "..." -o "$flag" = "…" ]; then
-				hasExtra=true;
+				subHasExtra=true;
 			else
 				echo -n "${flag@Q} ";
 			fi;
 		done < <(__flags);
 		echo -n ");";
 
-		if $hasExtra; then
+		if ! $hasExtra && $subHasExtra; then
 			echo -en "\n			hasExtra=\"-f\";";
 		fi;
 
 		echo ";";
 	done < <(__parts);
-)
-		esac;
-	fi;
 
-	$($hasV || echo -n "read -d '\n' -a COMPREPLY < <(")compgen$($hasV && echo -n " -V COMPREPLY" || true) -W "\${opts[*]}" \${hasExtra:---}\${hasExtra:+ --} "\${COMP_WORDS[\$COMP_CWORD]}"$($hasV || echo -n ")");
+	echo -e "\t\tesac;\n\tfi;\n";
 
-	readarray -t COMPREPLY < <(printf '%s\n' "\${COMPREPLY[@]}" | LC_ALL=C sort);
-}
+	echo -e "\t$($hasV || echo -n "read -d '\n' -a COMPREPLY < <(")compgen$($hasV && echo -n " -V COMPREPLY" || true) -W \"\${opts[*]}\" \${hasExtra:---}\${hasExtra:+ --} "\${COMP_WORDS[\$COMP_CWORD]}"$($hasV || echo -n ")");";
 
-complete -F "$fn" ${0@Q};
-HEREDOC
+	echo -e "\treadarray -t COMPREPLY < <(printf '%s\\\\n' "\${COMPREPLY[@]}" | LC_ALL=C sort)";
+	echo "}";
+
+	echo "complete -F '$fn' ${0@Q};";
 }
 
 __print_flags() {
