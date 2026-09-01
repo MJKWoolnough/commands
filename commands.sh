@@ -54,7 +54,7 @@ __flags() {
 }
 
 __completions() {
-	declare hasV="$(compgen -V var -W "a" "" && echo true || echo false)";
+	declare hasV="$(compgen -V var -W "a" "" &> /dev/null && echo true || echo false)";
 	declare fn="__completions";
 
 	while declare -F "$fn" > /dev/null; do
