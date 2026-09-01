@@ -53,6 +53,16 @@ __flags() {
 	done < <(__sections | sed -n '/^#/d; /^: /!q; s/^:  *//p');
 }
 
+__flag_completion() {
+	while read -r -d '' flag && read -r -d '' type && read -r -d ''; do
+		if [ "$flag" = "..." -o "$flag" = "…" ]; then
+			hasExtra=true;
+		else
+			echo -n "${flag@Q} ";
+		fi;
+	done < <(__flags);
+}
+
 __completions() {
 	declare hasV="$(compgen -V var -W "a" "" &> /dev/null && echo true || echo false)";
 	declare fn="__completions";
@@ -64,62 +74,51 @@ __completions() {
 
 	echo "$fn() {";
 	echo -en "\tdeclare -a opts=( "
+
 	if [ -n "${solo:-}" ]; then
-		while read -r -d '' flag && read -r -d '' type && read -r -d ''; do
-			if [ "$flag" = "..." -o "$flag" = "…" ]; then
-				hasExtra=true;
-			else
-				echo -n "${flag@Q} ";
-			fi;
-		done < <(__flags);
+		__flag_completion;
 	fi;
+
 	echo -en ");\n\tdeclare hasExtra=\"";
+
 	if $hasExtra; then
 		echo -n "-f";
 	fi;
+
 	echo -e "\";\n";
 	
 	if [ -z "${solo:-}" ]; then
 		echo -en "\tif [ \$COMP_CWORD -eq 1 ]; then\n\t\topts=( ";
+
 		while read part; do
 			echo -n "${part@Q} ";
 		done < <(__parts);
+
 		echo -en ");\n\telse\n\t\topts=( ";
 
-		while read -r -d '' flag && read -r -d '' type && read -r -d ''; do
-			if [ "$flag" = "..." -o "$flag" = "…" ]; then
-				hasExtra=true;
-			else
-				echo -n "${flag@Q} ";
-			fi;
-		done < <(__flags);
+		__flag_completion;
 
-		echo ");";
+		declare primaryHasExtra="$hasExtra";
 
-		echo -en "\t\thasExtra=\"";
+		echo -en ")\n\t\thasExtra=\"";
+
 		if $hasExtra; then
 			echo -n "-f";
 		fi;
-		echo -e "\";\n";
 
-		echo -e "\t\tcase \"\${COMP_WORDS[1]}\" in";
+		echo -e "\";\n\t\tcase \"\${COMP_WORDS[1]}\" in";
 
 		while read part; do
 			declare subHasExtra=false;
 
-			echo -en "		${part@Q})\n			opts+=( ";
+			echo -en "\t\t${part@Q})\n\t\t\topts+=( ";
 
-			while read -r -d '' flag && read -r -d '' type && read -r -d ''; do
-				if [ "$flag" = "..." -o "$flag" = "…" ]; then
-					subHasExtra=true;
-				else
-					echo -n "${flag@Q} ";
-				fi;
-			done < <(__flags);
+			__flag_completion;
+
 			echo -n ");";
 
-			if ! $hasExtra && $subHasExtra; then
-				echo -en "\n			hasExtra=\"-f\";";
+			if $hasExtra && ! $primaryHasExtra; then
+				echo -en "\n\t\t\thasExtra=\"-f\";";
 			fi;
 
 			echo ";";
@@ -129,7 +128,6 @@ __completions() {
 	fi;
 
 	echo -e "\t$($hasV || echo -n "read -d '\n' -a COMPREPLY < <(")compgen$($hasV && echo -n " -V COMPREPLY" || true) -W \"\${opts[*]}\" \${hasExtra:---}\${hasExtra:+ --} "\${COMP_WORDS[\$COMP_CWORD]}"$($hasV || echo -n ")");";
-
 	echo -e "\treadarray -t COMPREPLY < <(printf '%s\\\\n' "\${COMPREPLY[@]}" | LC_ALL=C sort)";
 	echo "}";
 
