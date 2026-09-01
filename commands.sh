@@ -111,19 +111,23 @@ __completions() {
 			echo -n "[${part@Q}]='' ";
 		done < <(__parts);
 
-		echo -en ");\n\telse\n\t\topts=( ";
+		echo -e ");\n\telse"
 
-		__flag_completion;
+		if [ "$(__flags | wc -c)" -gt 0 ]; then
+			echo -en "\t\topts=( ";
+
+			__flag_completion;
+
+			echo -e ");"
+		fi;
 
 		declare primaryHasExtra="$hasExtra";
 
-		echo -en ")\n\t\thasExtra=\"";
-
 		if $hasExtra; then
-			echo -n "-f";
+			echo -e "\t\thasExtra=\"-f\";";
 		fi;
 
-		echo -e "\";\n\t\tcase \"\${COMP_WORDS[1]}\" in";
+		echo -e "\t\tcase \"\${COMP_WORDS[1]}\" in";
 
 		while read part; do
 			echo -en "\t\t${part@Q})\n\t\t\topts+=( ";
