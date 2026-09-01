@@ -58,7 +58,24 @@ __flag_completion() {
 		if [ "$flag" = "..." -o "$flag" = "…" ]; then
 			hasExtra=true;
 		else
-			echo -n "${flag@Q} ";
+			declare t=" ";
+
+			if [ "${type:0:1}" = "[" -a "${type: -1}" = "]" ]; then
+				type="${type:1:-1}";
+			elif [ "${type: -2}" = "[]" ]; then
+				type="${type:0:-2}";
+				t="a";
+			fi;
+
+			if [ -z "$type" ]; then
+				t+="b";
+			elif [ "${type: -1}" = "#" ]; then
+				t+="n";
+			else
+				t+="s";
+			fi;
+
+			echo -n "[${flag@Q}]=${t@Q} ";
 		fi;
 	done < <(__flags);
 }
@@ -73,7 +90,7 @@ __completions() {
 	done;
 
 	echo "$fn() {";
-	echo -en "\tdeclare -a opts=( "
+	echo -en "\tdeclare -A opts=( "
 
 	if [ -n "${solo:-}" ]; then
 		__flag_completion;
@@ -91,7 +108,7 @@ __completions() {
 		echo -en "\tif [ \$COMP_CWORD -eq 1 ]; then\n\t\topts=( ";
 
 		while read part; do
-			echo -n "${part@Q} ";
+			echo -n "[${part@Q}]='' ";
 		done < <(__parts);
 
 		echo -en ");\n\telse\n\t\topts=( ";
@@ -109,8 +126,6 @@ __completions() {
 		echo -e "\";\n\t\tcase \"\${COMP_WORDS[1]}\" in";
 
 		while read part; do
-			declare subHasExtra=false;
-
 			echo -en "\t\t${part@Q})\n\t\t\topts+=( ";
 
 			__flag_completion;
@@ -127,7 +142,7 @@ __completions() {
 		echo -e "\t\tesac;\n\tfi;\n";
 	fi;
 
-	echo -e "\t$($hasV || echo -n "read -d '\n' -a COMPREPLY < <(")compgen$($hasV && echo -n " -V COMPREPLY" || true) -W \"\${opts[*]}\" \${hasExtra:---}\${hasExtra:+ --} "\${COMP_WORDS[\$COMP_CWORD]}"$($hasV || echo -n ")");";
+	echo -e "\t$($hasV || echo -n "read -d '\n' -a COMPREPLY < <(")compgen$($hasV && echo -n " -V COMPREPLY" || true) -W \"\${!opts[*]}\" \${hasExtra:---}\${hasExtra:+ --} "\${COMP_WORDS[\$COMP_CWORD]}"$($hasV || echo -n ")");";
 	echo -e "\treadarray -t COMPREPLY < <(printf '%s\\\\n' "\${COMPREPLY[@]}" | LC_ALL=C sort)";
 	echo "}";
 
