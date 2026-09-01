@@ -90,7 +90,7 @@ __completions() {
 	done;
 
 	echo "$fn() {";
-	echo -en "\tdeclare -A opts=( "
+	echo -en "\tdeclare -A opts=( ";
 
 	if [ -n "${solo:-}" ]; then
 		__flag_completion;
@@ -103,7 +103,7 @@ __completions() {
 	fi;
 
 	echo -e "\";\n";
-	
+
 	if [ -z "${solo:-}" ]; then
 		echo -en "\tif [ \$COMP_CWORD -eq 1 ]; then\n\t\topts=( ";
 
@@ -111,14 +111,14 @@ __completions() {
 			echo -n "[${part@Q}]='' ";
 		done < <(__parts);
 
-		echo -e ");\n\telse"
+		echo -e ");\n\telse";
 
 		if [ "$(__flags | wc -c)" -gt 0 ]; then
 			echo -en "\t\topts=( ";
 
 			__flag_completion;
 
-			echo -e ");"
+			echo -e ");";
 		fi;
 
 		declare primaryHasExtra="$hasExtra";
