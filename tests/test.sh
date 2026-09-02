@@ -136,7 +136,7 @@ Flags:
 	["5/test.sh func"]="FUNCTION
 FUNC"
 	["5/test.sh bash"]="BASH"
-	["5/test.sh python"]="123"
+	["5/test.sh perl"]="123"
 	["6/test.sh"]="Error: Subcommand required
 
 Usage: 6/test.sh [--help] SUBCOMMAND

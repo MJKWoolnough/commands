@@ -21,7 +21,7 @@ echo "FUNC";
 
 echo BASH;
 
---python
-#!/usr/bin/python
+--perl
+#!/usr/bin/perl
 
 print(123)
