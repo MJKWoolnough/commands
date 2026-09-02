@@ -308,7 +308,13 @@ Flags:
 	["completions 21/test.sh 2 def"]="--everywhere --floatFlag --global aFile bFile zFile"
 	["completions 21/test.sh 2 def --e"]="--everywhere"
 	["completions 21/test.sh 2 def z"]="zFile"
+	["completions 21/test.sh 3 def --global"]="--everywhere --floatFlag --global aFile bFile zFile"
+	["completions 21/test.sh 4 def --global --everywhere"]="aFile bFile zFile"
+	["completions 21/test.sh 4 def --floatFlag 1 "]="--everywhere --global aFile bFile zFile"
 	["completions 22/test.sh 2 abc"]="--everywhere --global --numberFlag --stringFlag aFile bFile zFile"
+	["completions 22/test.sh 3 abc --global"]="--everywhere --numberFlag --stringFlag aFile bFile zFile"
+	["completions 22/test.sh 3 abc --stringFlag"]="aFile bFile zFile"
+	["completions 22/test.sh 3 abc --numberFlag"]=""
 );
 
 declare debug=false;

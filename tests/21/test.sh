@@ -7,8 +7,8 @@ commands "--";
 
 
 --
-: --global
-: --everywhere string
+: --global []
+: --everywhere string[]
 
 --abc
 : --stringFlag [string]
