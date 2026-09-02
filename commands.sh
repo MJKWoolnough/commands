@@ -120,8 +120,7 @@ __completions() {
 		fn="__do_completion_$RANDOM";
 	done;
 
-	echo "$fn() {";
-	echo -en "\tdeclare -A opts=( ";
+	echo -en "$fn() {\n\tdeclare -A opts=( ";
 
 	if [ -n "${solo:-}" ]; then
 		__flag_completion;
