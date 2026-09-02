@@ -295,6 +295,7 @@ Flags:
 	["19/test.sh"]="ABC"
 	["19/test.sh --flag DEF"]="DEF"
 	["completions 19/test.sh 1"]="--flag"
+	["completions 19/test.sh 2 --flag"]="aFile bFile zFile"
 	["completions 19/test.sh 1 --"]="--flag"
 	["completions 20/test.sh 1"]="abc def"
 	["completions 20/test.sh 1 a"]="abc"
