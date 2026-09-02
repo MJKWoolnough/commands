@@ -60,19 +60,17 @@ __flag_completion() {
 		else
 			declare t=" ";
 
-			if [ "${type:0:1}" = "[" -a "${type: -1}" = "]" ]; then
-				type="${type:1:-1}";
-			elif [ "${type: -2}" = "[]" ]; then
+			if [ "${type: -2}" = "[]" ]; then
 				type="${type:0:-2}";
 				t="a";
+			elif [ "${type:0:1}" = "[" -a "${type: -1}" = "]" ]; then
+				type="${type:1:-1}";
 			fi;
 
 			if [ -z "$type" ]; then
-				t+="b";
-			elif [ "${type: -1}" = "#" ]; then
-				t+="n";
-			else
-				t+="s";
+				t+="!";
+			elif [ "${type: -1}" != "#" ]; then
+				t+="-f";
 			fi;
 
 			echo -n "[${flag@Q}]=${t@Q} ";
@@ -127,7 +125,7 @@ __completions() {
 			echo -e "\t\thasExtra=\"-f\";";
 		fi;
 
-		echo -e "\t\tcase \"\${COMP_WORDS[1]}\" in";
+		echo -e "\n\t\tcase \"\${COMP_WORDS[1]}\" in";
 
 		while read part; do
 			echo -en "\t\t${part@Q})\n\t\t\topts+=( ";
@@ -143,12 +141,25 @@ __completions() {
 			echo ";";
 		done < <(__parts);
 
-		echo -e "\t\tesac;\n\tfi;\n";
+		echo -e "\t\tesac;\n";
+		echo -e "\t\tdeclare onValue=\"$([ -z "${solo:0}" ] && echo "true" || echo "false")\";\n\t\tdeclare isAny=\"false\";\n";
+		echo -e "\t\tfor arg in \"\${COMP_WORDS[@]:1:\$(( \$COMP_CWORD - 1 ))}\"; do";
+		echo -e "\t\t\tdeclare flag=\"\${opts[\$arg]}\";\n";
+		echo -e "\t\t\tif \$onValue || [ -z \"\${flag:-}\" ]; then\n\t\t\t\tonValue=false;\n\n\t\t\t\tcontinue;\n\t\t\tfi;\n";
+		echo -e "\t\t\tif [ \"\${flag:0:1}\" = ' ' ]; then\n\t\t\t\tunset opts[\$arg];\n\t\t\tfi;\n";
+		echo -e "\t\t\tif [ \"\${flag:1}\" = '!' ]; then\n\t\t\t\tcontinue;\n\t\t\tfi;\n";
+		echo -e "\t\t\tonValue=true;";
+		echo -e "\t\t\tisAny=\"\${flag:1}\";";
+		echo -e "\t\tdone;\n";
+		echo -e "\t\tif \$onValue; then\n\t\t\topts=();\n\t\t\thasExtra=\"\$isAny\";\n\t\tfi;";
+		echo -e "\tfi;\n";
 	fi;
 
-	echo -e "\t$($hasV || echo -n "read -d '\\\\n' -a COMPREPLY < <(")compgen$($hasV && echo -n " -V COMPREPLY" || true) -W \"\${!opts[*]}\" \${hasExtra:---}\${hasExtra:+ --} "\${COMP_WORDS[\$COMP_CWORD]}"$($hasV || echo -n ")");";
-	echo -e "\treadarray -t COMPREPLY < <(printf '%s\\\\n' "\${COMPREPLY[@]}" | LC_ALL=C sort)";
-	echo "}";
+	echo -e "\tif [ -n \"\$hasExtra\" -o \${#opts[@]} -gt 0 ]; then";
+	echo -e "\t\t$($hasV || echo -n "read -d '\\\\n' -a COMPREPLY < <(")compgen$($hasV && echo -n " -V COMPREPLY" || true) \${opts[@]+ -W \"\${!opts[*]}\"} \${hasExtra:---}\${hasExtra:+ --} "\${COMP_WORDS[\$COMP_CWORD]}"$($hasV || echo -n ")");";
+	echo -e "\t\treadarray -t COMPREPLY < <(printf '%s\\\\n' "\${COMPREPLY[@]}" | LC_ALL=C sort)";
+	echo -e "\tfi;";
+	echo -e "}\n";
 
 	echo "complete -F '$fn' ${0@Q};";
 }
