@@ -183,13 +183,15 @@ __completions() {
 		echo -e "\tfi;\n";
 	fi;
 
-	echo -e "\tif [ -n \"\$hasExtra\" -o \${#opts[@]} -gt 0 ]; then";
-	echo -e "\t\t$($hasV || echo -n "read -d '\\\\n' -a COMPREPLY < <(")compgen$($hasV && echo -n " -V COMPREPLY" || true) \${opts[@]+ -W \"\${!opts[*]}\"} \${hasExtra:---}\${hasExtra:+ --} "\${COMP_WORDS[\$COMP_CWORD]}"$($hasV || echo -n ")");";
-	echo -e "\t\treadarray -t COMPREPLY < <(printf '%s\\\\n' "\${COMPREPLY[@]}" | LC_ALL=C sort)";
-	echo -e "\tfi;";
-	echo -e "}\n";
+	cat <<HEREDOC
+	if [ -n "\$hasExtra" -o \${#opts[@]} -gt 0 ]; then
+		$($hasV || echo -n "read -d '\\n' -a COMPREPLY < <(")compgen$($hasV && echo -n " -V COMPREPLY" || true) \${opts[@]+ -W "\${!opts[*]}"} \${hasExtra:---}\${hasExtra:+ --} "\${COMP_WORDS[\$COMP_CWORD]}"$($hasV || echo -n ")");
+		readarray -t COMPREPLY < <(printf '%s\\n' "\${COMPREPLY[@]}" | LC_ALL=C sort);
+	fi;
+}
 
-	echo "complete -F '$fn' ${0@Q};";
+complete -F ${fn@Q} ${0@Q};
+HEREDOC
 }
 
 __print_flags() {
