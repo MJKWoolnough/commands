@@ -78,6 +78,19 @@ __flag_completion() {
 	done < <(__flags);
 }
 
+__restrict_completion() {
+	echo -e "$1\tdeclare onValue=\"$([ -z "${solo:0}" ] && echo "true" || echo "false")\";\n$1\tdeclare isAny=\"false\";\n";
+	echo -e "$1\tfor arg in \"\${COMP_WORDS[@]:1:\$(( \$COMP_CWORD - 1 ))}\"; do";
+	echo -e "$1\t\tdeclare flag=\"\${opts[\$arg]}\";\n";
+	echo -e "$1\t\tif \$onValue || [ -z \"\${flag:-}\" ]; then\n$1\t\t\tonValue=false;\n\n$1\t\t\tcontinue;\n$1\t\tfi;\n";
+	echo -e "$1\t\tif [ \"\${flag:0:1}\" = ' ' ]; then\n$1\t\t\tunset opts[\$arg];\n$1\t\tfi;\n";
+	echo -e "$1\t\tif [ \"\${flag:1}\" = '!' ]; then\n$1\t\t\tcontinue;\n$1\t\tfi;\n";
+	echo -e "$1\t\tonValue=true;";
+	echo -e "$1\t\tisAny=\"\${flag:1}\";";
+	echo -e "$1\tdone;\n";
+	echo -e "$1\tif \$onValue; then\n$1\t\topts=();\n$1\t\thasExtra=\"\$isAny\";\n$1\tfi;";
+}
+
 __completions() {
 	declare hasV="$(compgen -V var -W "a" "" &> /dev/null && echo true || echo false)";
 	declare fn="__completions";
@@ -100,10 +113,12 @@ __completions() {
 		echo -n "-f";
 	fi;
 
-	echo -e "\";\n";
-
-	if [ -z "${solo:-}" ]; then
-		echo -en "\tif [ \$COMP_CWORD -eq 1 ]; then\n\t\topts=( ";
+	echo -e "\";";
+	if [ -n "${solo:-}" ]; then
+		__restrict_completion "";
+		echo;
+	else
+		echo -en "\n\tif [ \$COMP_CWORD -eq 1 ]; then\n\t\topts=( ";
 
 		while read part; do
 			echo -n "[${part@Q}]='' ";
@@ -125,7 +140,7 @@ __completions() {
 			echo -e "\t\thasExtra=\"-f\";";
 		fi;
 
-		echo -e "\n\t\tcase \"\${COMP_WORDS[1]}\" in";
+		echo -e "\t\tcase \"\${COMP_WORDS[1]}\" in";
 
 		while read part; do
 			echo -en "\t\t${part@Q})\n\t\t\topts+=( ";
@@ -142,16 +157,9 @@ __completions() {
 		done < <(__parts);
 
 		echo -e "\t\tesac;\n";
-		echo -e "\t\tdeclare onValue=\"$([ -z "${solo:0}" ] && echo "true" || echo "false")\";\n\t\tdeclare isAny=\"false\";\n";
-		echo -e "\t\tfor arg in \"\${COMP_WORDS[@]:1:\$(( \$COMP_CWORD - 1 ))}\"; do";
-		echo -e "\t\t\tdeclare flag=\"\${opts[\$arg]}\";\n";
-		echo -e "\t\t\tif \$onValue || [ -z \"\${flag:-}\" ]; then\n\t\t\t\tonValue=false;\n\n\t\t\t\tcontinue;\n\t\t\tfi;\n";
-		echo -e "\t\t\tif [ \"\${flag:0:1}\" = ' ' ]; then\n\t\t\t\tunset opts[\$arg];\n\t\t\tfi;\n";
-		echo -e "\t\t\tif [ \"\${flag:1}\" = '!' ]; then\n\t\t\t\tcontinue;\n\t\t\tfi;\n";
-		echo -e "\t\t\tonValue=true;";
-		echo -e "\t\t\tisAny=\"\${flag:1}\";";
-		echo -e "\t\tdone;\n";
-		echo -e "\t\tif \$onValue; then\n\t\t\topts=();\n\t\t\thasExtra=\"\$isAny\";\n\t\tfi;";
+
+		__restrict_completion "\t";
+
 		echo -e "\tfi;\n";
 	fi;
 
