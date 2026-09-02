@@ -79,16 +79,36 @@ __flag_completion() {
 }
 
 __restrict_completion() {
-	echo -e "$1\tdeclare onValue=\"$([ -z "${solo:0}" ] && echo "true" || echo "false")\";\n$1\tdeclare isAny=\"false\";\n";
-	echo -e "$1\tfor arg in \"\${COMP_WORDS[@]:1:\$(( \$COMP_CWORD - 1 ))}\"; do";
-	echo -e "$1\t\tdeclare flag=\"\${opts[\$arg]}\";\n";
-	echo -e "$1\t\tif \$onValue || [ -z \"\${flag:-}\" ]; then\n$1\t\t\tonValue=false;\n\n$1\t\t\tcontinue;\n$1\t\tfi;\n";
-	echo -e "$1\t\tif [ \"\${flag:0:1}\" = ' ' ]; then\n$1\t\t\tunset opts[\$arg];\n$1\t\tfi;\n";
-	echo -e "$1\t\tif [ \"\${flag:1}\" = '!' ]; then\n$1\t\t\tcontinue;\n$1\t\tfi;\n";
-	echo -e "$1\t\tonValue=true;";
-	echo -e "$1\t\tisAny=\"\${flag:1}\";";
-	echo -e "$1\tdone;\n";
-	echo -e "$1\tif \$onValue; then\n$1\t\topts=();\n$1\t\thasExtra=\"\$isAny\";\n$1\tfi;";
+	cat <<HEREDOC
+$1	declare onValue="$([ -z "${solo:0}" ] && echo "true" || echo "false")";
+$1	declare isAny="false";
+
+$1	for arg in "\${COMP_WORDS[@]:1:\$(( \$COMP_CWORD - 1 ))}"; do
+$1		declare flag="\${opts[\$arg]}";
+
+$1		if \$onValue || [ -z "\${flag:-}" ]; then
+$1			onValue=false;
+
+$1			continue;
+$1		fi;
+
+$1		if [ "\${flag:0:1}" = ' ' ]; then
+$1			unset opts[\$arg];
+$1		fi;
+
+$1		if [ "\${flag:1}" = '!' ]; then
+$1			continue;
+$1		fi;
+
+$1		onValue=true;
+$1		isAny="\${flag:1}";
+$1	done;
+
+$1	if \$onValue; then
+$1		opts=();
+$1		hasExtra="\$isAny";
+$1	fi;
+HEREDOC
 }
 
 __completions() {
@@ -158,7 +178,7 @@ __completions() {
 
 		echo -e "\t\tesac;\n";
 
-		__restrict_completion "\t";
+		__restrict_completion "	";
 
 		echo -e "\tfi;\n";
 	fi;
