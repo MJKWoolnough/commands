@@ -56,7 +56,37 @@ __flags() {
 }
 
 __generate_roff() {
-	echo ".TH $(basename "$0" | tr a-z A-Z) 1";
+	declare cmd="$(basename "$0")";
+	declare desc="$(__description)";
+
+	echo ".TH $(tr a-z A-Z <<<"$cmd") 1";
+	echo ".SH NAME";
+	echo "$cmd";
+	echo ".SH SYNOPSIS";
+	echo ".B $cmd";
+	echo "\fIsubcommand\fR [\fIglobal flags\fR] [\fIsubcommand flags\fR]";
+	echo ".SH DESCRIPTION";
+	echo "$desc";
+	echo ".SH SUBCOMMANDS";
+
+	while read part; do
+		declare desc="$(__description)";
+
+		echo ".TP";
+		echo ".B $part";
+		if [ -n "$desc" ]; then
+			echo "$desc";
+		fi;
+	done < <(__parts);
+
+	echo ".SH GLOBAL FLAGS";
+
+	while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
+		echo ".TP";
+		echo -n ".B ";
+		sed -e 's/,/, /g; s/#//g' <<<"$flag${type:+ }$type";
+		echo $desc;
+	done < <(__flags);
 }
 
 __flag_completion() {
