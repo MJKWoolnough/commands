@@ -8,9 +8,11 @@ commands() {
 		declare solo=1;
 		declare part="";
 
-		if [ "${__args[0]:-}" != "--completions" ]; then
+		case "${__args[0]:-}" in
+		"--completions"|"--generate-roff");;
+		*)
 			__args=( "$part" "${__args[@]}" );
-		fi;
+		esac;
 
 		eval "__parts() { [ -n \"\$part\" ] && echo -e ${part@Q}; }; __sections() { [ -n \"\$part\" ] && cat ${0@Q}; }";;
 	1)
