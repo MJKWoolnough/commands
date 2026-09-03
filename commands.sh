@@ -65,8 +65,12 @@ __generate_roff() {
 	echo ".SH SYNOPSIS";
 	echo ".B $cmd";
 	echo "\fIsubcommand\fR [\fIglobal_flags\fR] [\fIsubcommand_flags\fR]";
-	echo ".SH DESCRIPTION";
-	echo "$desc";
+
+	if [ -n "$desc" ]; then
+		echo ".SH DESCRIPTION";
+		echo "$desc";
+	fi;
+
 	echo ".SH SUBCOMMANDS";
 
 	while read part; do
@@ -79,14 +83,16 @@ __generate_roff() {
 		fi;
 	done < <(__parts);
 
-	echo ".SH GLOBAL FLAGS";
+	if __flags | grep -q .; then
+		echo ".SH GLOBAL FLAGS";
 
-	while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
-		echo ".TP";
-		echo -n ".B ";
-		sed -e 's/,/, /g; s/#//g' <<<"$flag${type:+ }$type";
-		echo $desc;
-	done < <(__flags);
+		while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
+			echo ".TP";
+			echo -n ".B ";
+			sed -e 's/,/, /g; s/#//g' <<<"$flag${type:+ }$type";
+			echo $desc;
+		done < <(__flags);
+	fi;
 
 	while read part; do
 		declare desc="$(__description)";
@@ -101,14 +107,16 @@ __generate_roff() {
 			echo "$desc";
 		fi;
 
-	echo ".SH FLAGS";
+		if __flags | grep -q .; then
+			echo ".SH FLAGS";
 
-	while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
-		echo ".TP";
-		echo -n ".B ";
-		sed -e 's/,/, /g; s/#//g' <<<"$flag${type:+ }$type";
-		echo $desc;
-	done < <(__flags);
+			while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
+				echo ".TP";
+				echo -n ".B ";
+				sed -e 's/,/, /g; s/#//g' <<<"$flag${type:+ }$type";
+				echo $desc;
+			done < <(__flags);
+		fi;
 	done < <(__parts);
 }
 
