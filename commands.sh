@@ -9,7 +9,7 @@ commands() {
 		declare part="";
 
 		case "${__args[0]:-}" in
-		"--completions"|"--generate-roff");;
+		"--completions"|"--generate-roff"|"--man-page");;
 		*)
 			__args=( "$part" "${__args[@]}" );
 		esac;
@@ -390,6 +390,10 @@ __handle_parts() {
 		exit 0;;
 	"--generate-roff")
 		__generate_roff;
+
+		exit 0;;
+	"--man-page")
+		man -l <(__generate_roff);
 
 		exit 0;;
 	esac;
