@@ -4,6 +4,10 @@
 
 commands --;
 
+--
+# Global description
+: --global [flag] # Global FLAG
+
 --abc
 # The first subcommand
 : --flag string # First flag
