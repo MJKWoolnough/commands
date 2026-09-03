@@ -64,7 +64,7 @@ __generate_roff() {
 	echo "$cmd";
 	echo ".SH SYNOPSIS";
 	echo ".B $cmd";
-	echo "\fIsubcommand\fR [\fIglobal flags\fR] [\fIsubcommand flags\fR]";
+	echo "\fIsubcommand\fR [\fIglobal_flags\fR] [\fIsubcommand_flags\fR]";
 	echo ".SH DESCRIPTION";
 	echo "$desc";
 	echo ".SH SUBCOMMANDS";
@@ -87,6 +87,29 @@ __generate_roff() {
 		sed -e 's/,/, /g; s/#//g' <<<"$flag${type:+ }$type";
 		echo $desc;
 	done < <(__flags);
+
+	while read part; do
+		declare desc="$(__description)";
+
+		echo ".ce 1";
+		echo ".SH SUBCOMMAND: $part";
+		echo ".SH SYNOPSIS";
+		echo ".B $cmd \fI$part\fR [\fIglobal_flags\fR] [\fIsubcommand_flags\fR]";
+
+		if [ -n "$desc" ]; then
+			echo ".SH DESCRIPTION";
+			echo "$desc";
+		fi;
+
+	echo ".SH FLAGS";
+
+	while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
+		echo ".TP";
+		echo -n ".B ";
+		sed -e 's/,/, /g; s/#//g' <<<"$flag${type:+ }$type";
+		echo $desc;
+	done < <(__flags);
+	done < <(__parts);
 }
 
 __flag_completion() {
