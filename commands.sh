@@ -53,6 +53,10 @@ __flags() {
 	done < <(__sections | sed -n '/^#/d; /^: /!q; s/^:  *//p');
 }
 
+__generate_roff() {
+	echo ".TH $(basename "$0" | tr a-z A-Z) 1";
+}
+
 __flag_completion() {
 	while read -r -d '' flag && read -r -d '' type && read -r -d ''; do
 		if [ "$flag" = "..." -o "$flag" = "…" ]; then
@@ -318,6 +322,10 @@ __handle_parts() {
 		exit 0;
 	elif [ "${1:-}" = "--completions" ]; then
 		__completions;
+
+		exit 0;
+	elif [ "${1:-}" = "--generate-roff" ]; then
+		__generate_roff;
 
 		exit 0;
 	fi;
