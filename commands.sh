@@ -348,19 +348,20 @@ __bind_flags() {
 }
 
 __handle_parts() {
-	if [ "${1:-}" = "--help" ]; then
+	case "${1:-}" in
+	"--help")
 		__help;
 
-		exit 0;
-	elif [ "${1:-}" = "--completions" ]; then
+		exit 0;;
+	"--completions")
 		__completions;
 
-		exit 0;
-	elif [ "${1:-}" = "--generate-roff" ]; then
+		exit 0;;
+	"--generate-roff")
 		__generate_roff;
 
-		exit 0;
-	fi;
+		exit 0;;
+	esac;
 
 	if [ -z "${1:-}" ]; then
 		{
