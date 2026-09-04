@@ -65,11 +65,7 @@ __generate_roff() {
 	echo ".SH SYNOPSIS";
 	echo ".B $cmd";
 	echo "${solo-\fIsubcommand\fR [\fIglobal_flags\fR] [\fIsubcommand_}${solo+[\fI}flags\fR]";
-
-	if [ -n "$desc" ]; then
-		echo ".SH DESCRIPTION";
-		echo "$desc";
-	fi;
+	echo -e "${desc:+.SH DESCRIPTION\n$desc}";
 
 	if [ ! -v solo ]; then
 		echo ".SH SUBCOMMANDS";
@@ -77,11 +73,7 @@ __generate_roff() {
 		while read part; do
 			declare desc="$(__description)";
 
-			echo ".TP";
-			echo ".B $part";
-			if [ -n "$desc" ]; then
-				echo "$desc";
-			fi;
+			echo -e ".TP\n.B $part${desc+\n$desc}";
 		done < <(__parts);
 	fi;
 
@@ -89,10 +81,9 @@ __generate_roff() {
 		echo ".SH ${solo-GLOBAL }FLAGS";
 
 		while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
-			echo ".TP";
-			echo -n ".B ";
+			echo -en ".TP\n.B ";
 			sed -e 's/,/, /g; s/#//g' <<<"$flag${type:+ }$type";
-			echo $desc;
+			echo "$desc";
 		done < <(__flags);
 	fi;
 
@@ -100,24 +91,20 @@ __generate_roff() {
 		while read part; do
 			declare desc="$(__description)";
 
-			echo ".ce 1";
-			echo ".SH SUBCOMMAND: $part";
-			echo ".SH SYNOPSIS";
+			echo -e ".ce 1\n.SH SUBCOMMAND: $part\n.SH SYNOPSIS";
 			echo ".B $cmd \fI$part\fR [\fIglobal_flags\fR] [\fIsubcommand_flags\fR]";
 
 			if [ -n "$desc" ]; then
-				echo ".SH DESCRIPTION";
-				echo "$desc";
+				echo -e ".SH DESCRIPTION\n$desc";
 			fi;
 
 			if __flags | grep -q .; then
 				echo ".SH FLAGS";
 
 				while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
-					echo ".TP";
-					echo -n ".B ";
+					echo -e ".TP\n.B ";
 					sed -e 's/,/, /g; s/#//g' <<<"$flag${type:+ }$type";
-					echo $desc;
+					echo "$desc";
 				done < <(__flags);
 			fi;
 		done < <(__parts);
