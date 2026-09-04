@@ -300,7 +300,7 @@ __usage() {
 	declare additional=false;
 	declare additionalDesc="";
 
-	echo -n "Usage: $0 [--help] ${part:-SUBCOMMAND}";
+	echo -n "Usage: $0 [--help]${solo- ${part:-SUBCOMMAND}}";
 
 	while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
 		flag="${flag%,*}";

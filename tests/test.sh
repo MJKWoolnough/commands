@@ -246,7 +246,7 @@ Flags:
   	["11/test.sh abc -a test"]="test"
   	["12/test.sh"]="Error: Required flag not set: --flag
 
-Usage: 12/test.sh [--help]  --flag string
+Usage: 12/test.sh [--help] --flag string
 My command
 
 Flags:
@@ -308,12 +308,12 @@ ID: 20
 ID: 99"
 	["18/test.sh --id 1 --id 20 --id bad"]="Error: Invalid flag value: --id bad
 
-Usage: 18/test.sh [--help]  [--id id]...
+Usage: 18/test.sh [--help] [--id id]...
 List IDs
 
 Flags:
   --id  ID"
-	["19/test.sh --help"]="Usage: 19/test.sh [--help]  [--flag string]
+	["19/test.sh --help"]="Usage: 19/test.sh [--help] [--flag string]
 Solo description
 
 Flags:
