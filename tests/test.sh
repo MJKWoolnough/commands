@@ -314,6 +314,7 @@ List IDs
 Flags:
   --id  ID"
 	["19/test.sh --help"]="Usage: 19/test.sh [--help]  [--flag string]
+Solo description
 
 Flags:
   --flag  Default: ABC"

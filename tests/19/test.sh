@@ -1,4 +1,5 @@
 #!/bin/bash
+# Solo description
 : --flag [string] # Default: $key
 
 declare key="ABC"
