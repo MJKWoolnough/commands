@@ -62,7 +62,7 @@ __generate_roff() {
 	declare hasExtra=false;
 	declare extraDesc="";
 
-	echo ".TH $(tr a-z A-Z <<< "$cmd") 1";
+	echo ".TH ${cmd^^} 1";
 	echo ".SH NAME";
 	echo "$cmd";
 	echo ".SH SYNOPSIS";
