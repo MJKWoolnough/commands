@@ -58,6 +58,8 @@ __flags() {
 __generate_roff() {
 	declare cmd="$(basename "$0")";
 	declare desc="$(__description)";
+	declare hasExtra=false;
+	declare extraDesc="";
 
 	echo ".TH $(tr a-z A-Z <<<"$cmd") 1";
 	echo ".SH NAME";
@@ -81,15 +83,29 @@ __generate_roff() {
 		echo ".SH ${solo-GLOBAL }FLAGS";
 
 		while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
+			if [ "$flag" = "..." -o "$flag" = "…" ]; then
+				hasExtra=true;
+				extraDesc="$desc";
+
+				continue;
+			fi;
+
 			echo -en ".TP\n.B ";
 			sed -e 's/,/, /g; s/#//g' <<<"$flag${type:+ }$type";
 			echo "$desc";
 		done < <(__flags);
+
+		if $hasExtra; then
+			echo -en ".TP\n.B ...";
+			sed -e 's/,/, /g; s/#//g' <<<"$flag${type:+ }$type";
+			echo "$extraDesc";
+		fi;
 	fi;
 
 	if [ ! -v solo ]; then
 		while read part; do
 			declare desc="$(__description)";
+			declare hasExtra=false;
 
 			echo -e ".ce 1\n.SH SUBCOMMAND: $part\n.SH SYNOPSIS";
 			echo ".B $cmd \fI$part\fR [\fIglobal_flags\fR] [\fIsubcommand_flags\fR]";
@@ -102,10 +118,23 @@ __generate_roff() {
 				echo ".SH FLAGS";
 
 				while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
+					if [ "$flag" = "..." -o "$flag" = "…" ]; then
+						hasExtra=true;
+						extraDesc="$desc";
+
+						continue;
+					fi;
+
 					echo -e ".TP\n.B ";
 					sed -e 's/,/, /g; s/#//g' <<<"$flag${type:+ }$type";
 					echo "$desc";
 				done < <(__flags);
+
+				if $hasExtra; then
+					echo -en ".TP\n.B ...";
+					sed -e 's/,/, /g; s/#//g' <<<"$flag${type:+ }$type";
+					echo "$extraDesc";
+				fi;
 			fi;
 		done < <(__parts);
 	fi;
