@@ -9,9 +9,10 @@ commands() {
 		declare part="";
 
 		case "${__args[0]:-}" in
-		"--completions"|"--generate-roff"|"--man-page");;
+		"--completions"|"--generate-roff"|"--man-page")
+			;;
 		*)
-			__args=( "$part" "${__args[@]}" );
+			__args=( "$part" "${__args[@]}" );;
 		esac;
 
 		eval "__parts() { [ -n \"\$part\" ] && echo -e ${part@Q}; }; __sections() { [ -n \"\$part\" ] && cat ${0@Q}; }";;
@@ -61,7 +62,7 @@ __generate_roff() {
 	declare hasExtra=false;
 	declare extraDesc="";
 
-	echo ".TH $(tr a-z A-Z <<<"$cmd") 1";
+	echo ".TH $(tr a-z A-Z <<< "$cmd") 1";
 	echo ".SH NAME";
 	echo "$cmd";
 	echo ".SH SYNOPSIS";
@@ -91,13 +92,13 @@ __generate_roff() {
 			fi;
 
 			echo -en ".TP\n.B ";
-			sed -e 's/,/, /g; s/#//g' <<<"$flag${type:+ }$type";
+			sed -e 's/,/, /g; s/#//g' <<< "$flag${type:+ }$type";
 			echo "$desc";
 		done < <(__flags);
 
 		if $hasExtra; then
 			echo -en ".TP\n.B ...";
-			sed -e 's/,/, /g; s/#//g' <<<"$flag${type:+ }$type";
+			sed -e 's/,/, /g; s/#//g' <<< "$flag${type:+ }$type";
 			echo "$extraDesc";
 		fi;
 	fi;
@@ -126,13 +127,13 @@ __generate_roff() {
 					fi;
 
 					echo -e ".TP\n.B ";
-					sed -e 's/,/, /g; s/#//g' <<<"$flag${type:+ }$type";
+					sed -e 's/,/, /g; s/#//g' <<< "$flag${type:+ }$type";
 					echo "$desc";
 				done < <(__flags);
 
 				if $hasExtra; then
 					echo -en ".TP\n.B ...";
-					sed -e 's/,/, /g; s/#//g' <<<"$flag${type:+ }$type";
+					sed -e 's/,/, /g; s/#//g' <<< "$flag${type:+ }$type";
 					echo "$extraDesc";
 				fi;
 			fi;
