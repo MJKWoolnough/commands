@@ -5,7 +5,7 @@ __args=( "$@" );
 commands() {
 	case "$#" in
 	0)
-		declare solo=1;
+		declare solo="";
 		declare part="";
 
 		case "${__args[0]:-}" in
@@ -64,27 +64,29 @@ __generate_roff() {
 	echo "$cmd";
 	echo ".SH SYNOPSIS";
 	echo ".B $cmd";
-	echo "\fIsubcommand\fR [\fIglobal_flags\fR] [\fIsubcommand_flags\fR]";
+	echo "${solo-\fIsubcommand\fR [\fIglobal_flags\fR] [\fIsubcommand_}${solo+[\fI}flags\fR]";
 
 	if [ -n "$desc" ]; then
 		echo ".SH DESCRIPTION";
 		echo "$desc";
 	fi;
 
-	echo ".SH SUBCOMMANDS";
+	if [ ! -v solo ]; then
+		echo ".SH SUBCOMMANDS";
 
-	while read part; do
-		declare desc="$(__description)";
+		while read part; do
+			declare desc="$(__description)";
 
-		echo ".TP";
-		echo ".B $part";
-		if [ -n "$desc" ]; then
-			echo "$desc";
-		fi;
-	done < <(__parts);
+			echo ".TP";
+			echo ".B $part";
+			if [ -n "$desc" ]; then
+				echo "$desc";
+			fi;
+		done < <(__parts);
+	fi;
 
 	if __flags | grep -q .; then
-		echo ".SH GLOBAL FLAGS";
+		echo ".SH ${solo-GLOBAL }FLAGS";
 
 		while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
 			echo ".TP";
@@ -94,30 +96,32 @@ __generate_roff() {
 		done < <(__flags);
 	fi;
 
-	while read part; do
-		declare desc="$(__description)";
+	if [ ! -v solo ]; then
+		while read part; do
+			declare desc="$(__description)";
 
-		echo ".ce 1";
-		echo ".SH SUBCOMMAND: $part";
-		echo ".SH SYNOPSIS";
-		echo ".B $cmd \fI$part\fR [\fIglobal_flags\fR] [\fIsubcommand_flags\fR]";
+			echo ".ce 1";
+			echo ".SH SUBCOMMAND: $part";
+			echo ".SH SYNOPSIS";
+			echo ".B $cmd \fI$part\fR [\fIglobal_flags\fR] [\fIsubcommand_flags\fR]";
 
-		if [ -n "$desc" ]; then
-			echo ".SH DESCRIPTION";
-			echo "$desc";
-		fi;
+			if [ -n "$desc" ]; then
+				echo ".SH DESCRIPTION";
+				echo "$desc";
+			fi;
 
-		if __flags | grep -q .; then
-			echo ".SH FLAGS";
+			if __flags | grep -q .; then
+				echo ".SH FLAGS";
 
-			while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
-				echo ".TP";
-				echo -n ".B ";
-				sed -e 's/,/, /g; s/#//g' <<<"$flag${type:+ }$type";
-				echo $desc;
-			done < <(__flags);
-		fi;
-	done < <(__parts);
+				while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
+					echo ".TP";
+					echo -n ".B ";
+					sed -e 's/,/, /g; s/#//g' <<<"$flag${type:+ }$type";
+					echo $desc;
+				done < <(__flags);
+			fi;
+		done < <(__parts);
+	fi;
 }
 
 __flag_completion() {
@@ -147,7 +151,7 @@ __flag_completion() {
 
 __restrict_completion() {
 	cat <<HEREDOC
-$1	declare onValue="$([ -z "${solo:0}" ] && echo "true" || echo "false")";
+$1	declare onValue="$([ -v solo ] && echo "false" || echo "true")";
 $1	declare isAny="false";
 
 $1	for arg in "\${COMP_WORDS[@]:1:\$(( \$COMP_CWORD - 1 ))}"; do
@@ -189,7 +193,7 @@ __completions() {
 
 	echo -en "$fn() {\n\tdeclare -A opts=( ";
 
-	if [ -n "${solo:-}" ]; then
+	if [ -v solo ]; then
 		__flag_completion;
 	fi;
 
@@ -200,7 +204,7 @@ __completions() {
 	fi;
 
 	echo -e "\";";
-	if [ -n "${solo:-}" ]; then
+	if [ -v solo ]; then
 		__restrict_completion "";
 		echo;
 	else
@@ -566,7 +570,7 @@ __handle_parts() {
 		fi;
 	done;
 
-	if [ -n "${solo:-}" ]; then
+	if [ -v solo ]; then
 		eval "$(__bind_flags)";
 
 		return 0;
