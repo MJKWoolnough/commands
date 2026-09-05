@@ -64,7 +64,7 @@ __print_flags_usage() {
 			additional=true;
 			additionalDesc="$desc";
 		elif [ "${type: -1}" = "]" -o "$type" = "" ]; then
-			echo -n " [${1+\\fI}$flag$(__flag_type "${type:-}")${1+\\fR}]";
+			echo -n " [${1+\\fI}$flag${1+\\fR}$(__flag_type "${type:-}")]";
 
 			if [ "${type: -2}" = "[]" ]; then
 				echo -n "...";
@@ -128,7 +128,7 @@ __generate_roff() {
 			declare hasExtra=false;
 
 			echo -e ".ce 1\n.SH SUBCOMMAND: $part\n.SH SYNOPSIS";
-			echo ".B $cmd \fI$part\fR [\fIglobal_flags\fR] [\fIsubcommand_flags\fR]";
+			echo ".B $cmd \fI$part\fR [\fIglobal_flags\fR]$(__print_flags_usage "")";
 
 			if [ -n "$desc" ]; then
 				echo -e ".SH DESCRIPTION\n$desc";
