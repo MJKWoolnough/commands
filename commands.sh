@@ -64,13 +64,13 @@ __print_flags_usage() {
 			additional=true;
 			additionalDesc="$desc";
 		elif [ "${type: -1}" = "]" -o "$type" = "" ]; then
-			echo -n " [$flag$(__flag_type "${type:-}")]";
+			echo -n " [${1+\\fI}$flag$(__flag_type "${type:-}")${1+\\fR}]";
 
 			if [ "${type: -2}" = "[]" ]; then
 				echo -n "...";
 			fi;
 		else
-			printf " %s%s" "$flag" "$(__flag_type "$type")";
+			printf " %s%s" "${1+\\fI}$flag${1+\\fR}" "$(__flag_type "$type")";
 		fi;
 	done < <(__flags);
 }
@@ -86,7 +86,7 @@ __generate_roff() {
 	echo "$cmd";
 	echo ".SH SYNOPSIS";
 	echo ".B $cmd";
-	echo "${solo-\fIsubcommand\fR [\fIglobal_flags\fR] [\fIsubcommand_}${solo+[\fI}flags\fR]";
+	echo "${solo-\fIsubcommand\fR$(part="" __print_flags_usage "") [\fIsubcommand_}${solo+[\fI}flags\fR]";
 	echo -e "${desc:+.SH DESCRIPTION\n$desc}";
 
 	if [ ! -v solo ]; then
