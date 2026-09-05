@@ -86,7 +86,7 @@ __print_flags_usage() {
 __generate_roff() {
 	declare cmd="$(basename "$0")";
 	declare desc="$(__description)";
-	declare additional=false;
+	declare additional="";
 	declare additionalDesc="";
 
 	echo ".TH ${cmd^^} 1";
@@ -104,11 +104,7 @@ __generate_roff() {
 		echo -n " [\fIsubcommand_flags\fR]";
 	fi;
 
-	if $additional; then
-		echo " [\fIARGS\fR]...";
-	else
-		echo;
-	fi;
+	echo " ${additional:+[\fIARGS\fR]...}";
 
 	echo -e "${desc:+.SH DESCRIPTION\n$desc}";
 
@@ -152,11 +148,7 @@ __generate_roff() {
 			echo -n ".B $cmd \fI$part\fR [\fIglobal_flags\fR]";
 			__print_flags_usage ""
 
-			if $additional; then
-				echo " [\fIARGS\fR]...";
-			else
-				echo;
-			fi;
+			echo " ${additional:+[\fIARGS\fR]...}";
 
 			if [ -n "$desc" ]; then
 				echo -e ".SH DESCRIPTION\n$desc";
@@ -357,7 +349,7 @@ __print_flags() {
 
 __usage() {
 	declare part="${1:-}";
-	declare additional=false;
+	declare additional="";
 	declare additionalDesc="";
 
 	echo -n "Usage: $0 [--help]${solo- ${part:-SUBCOMMAND}}";
@@ -368,11 +360,7 @@ __usage() {
 
 	__print_flags_usage;
 
-	if $additional; then
-		echo " ARGS";
-	else
-		echo;
-	fi;
+	echo "${additional:+ ARGS}";
 
 	__description;
 
