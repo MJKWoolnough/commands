@@ -105,7 +105,6 @@ __generate_roff() {
 	fi;
 
 	echo " ${additional:+[\fIARGS\fR]...}";
-
 	echo -e "${desc:+.SH DESCRIPTION\n$desc}";
 
 	if [ ! -v solo ]; then
@@ -146,8 +145,7 @@ __generate_roff() {
 
 			echo -e ".ce 1\n.SH SUBCOMMAND: $part\n.SH SYNOPSIS";
 			echo -n ".B $cmd \fI$part\fR [\fIglobal_flags\fR]";
-			__print_flags_usage ""
-
+			__print_flags_usage "";
 			echo " ${additional:+[\fIARGS\fR]...}";
 
 			if [ -n "$desc" ]; then
