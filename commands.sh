@@ -56,6 +56,14 @@ __flags() {
 	done < <(__sections | sed -n '/^#/d; /^: /!q; s/^:  *//p');
 }
 
+__flag_type() {
+	declare type="$(sed -e 's/\[\]$//; s/^\[\(.*\)\]$/\1/; s/#*$//' <<< "$1")";
+
+	if [ "$type" != "" ]; then
+		printf " %s" "$type";
+	fi;
+}
+
 __print_flags_usage() {
 	while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
 		flag="${flag%,*}";
@@ -111,13 +119,13 @@ __generate_roff() {
 			fi;
 
 			echo -en ".TP\n.B ";
-			sed -e 's/,/, /g; s/#//g' <<< "$flag${type:+ }$type";
+			sed -e 's/,/, /g; s/#//g' <<< "$flag$(__flag_type "$type")";
 			echo "$desc";
 		done < <(__flags);
 
 		if $hasExtra; then
 			echo -en ".TP\n.B ...";
-			sed -e 's/,/, /g; s/#//g' <<< "$flag${type:+ }$type";
+			sed -e 's/,/, /g; s/#//g' <<< "$flag$(__flag_type "$type")";
 			echo "$extraDesc";
 		fi;
 	fi;
@@ -146,13 +154,13 @@ __generate_roff() {
 					fi;
 
 					echo -e ".TP\n.B ";
-					sed -e 's/,/, /g; s/#//g' <<< "$flag${type:+ }$type";
+					sed -e 's/,/, /g; s/#//g' <<< "$flag$(__flag_type "$type")";
 					echo "$desc";
 				done < <(__flags);
 
 				if $hasExtra; then
 					echo -en ".TP\n.B ...";
-					sed -e 's/,/, /g; s/#//g' <<< "$flag${type:+ }$type";
+					sed -e 's/,/, /g; s/#//g' <<< "$flag$(__flag_type "$type")";
 					echo "$extraDesc";
 				fi;
 			fi;
@@ -375,14 +383,6 @@ __help() {
 	done < <(__parts);
 
 	__print_flags;
-}
-
-__flag_type() {
-	declare type="$(sed -e 's/\[\]$//; s/^\[\(.*\)\]$/\1/; s/#*$//' <<< "$1")";
-
-	if [ "$type" != "" ]; then
-		printf " %s" "$type";
-	fi;
 }
 
 __section_help() {
