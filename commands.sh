@@ -86,8 +86,8 @@ __print_flags_usage() {
 __generate_roff() {
 	declare cmd="$(basename "$0")";
 	declare desc="$(__description)";
-	declare hasExtra=false;
-	declare extraDesc="";
+	declare additional=false;
+	declare additionalDesc="";
 
 	echo ".TH ${cmd^^} 1";
 	echo ".SH NAME";
@@ -98,9 +98,16 @@ __generate_roff() {
 	if [ -v solo ]; then
 		echo -n "\f";
 		__print_flags_usage "";
-		echo;
 	else
-		echo "\fIsubcommand\fR$(part="" __print_flags_usage "") [\fIsubcommand_flags\fR]";
+		echo -n "\fIsubcommand\fR";
+		__print_flags_usage "";
+		echo -n " [\fIsubcommand_flags\fR]";
+	fi;
+
+	if $additional; then
+		echo " [\fIARGS\fR]...";
+	else
+		echo;
 	fi;
 
 	echo -e "${desc:+.SH DESCRIPTION\n$desc}";
@@ -120,9 +127,6 @@ __generate_roff() {
 
 		while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
 			if [ "$flag" = "..." -o "$flag" = "…" ]; then
-				hasExtra=true;
-				extraDesc="$desc";
-
 				continue;
 			fi;
 
@@ -130,21 +134,29 @@ __generate_roff() {
 			sed -e 's/,/, /g; s/#//g' <<< "$flag$(__flag_type "$type")";
 			echo "$desc";
 		done < <(__flags);
+	fi;
 
-		if $hasExtra; then
-			echo -en ".TP\n.B ...";
-			sed -e 's/,/, /g; s/#//g' <<< "$flag$(__flag_type "$type")";
-			echo "$extraDesc";
-		fi;
+	if [ -n "$additionalDesc" ]; then
+		echo ".SH ADDITIONAL ARGUMENTS";
+		echo "$additionalDesc";
 	fi;
 
 	if [ ! -v solo ]; then
+		declare additional=false;
+		declare additionalDesc="";
+
 		while read part; do
 			declare desc="$(__description)";
-			declare hasExtra=false;
 
 			echo -e ".ce 1\n.SH SUBCOMMAND: $part\n.SH SYNOPSIS";
-			echo ".B $cmd \fI$part\fR [\fIglobal_flags\fR]$(__print_flags_usage "")";
+			echo -n ".B $cmd \fI$part\fR [\fIglobal_flags\fR]";
+			__print_flags_usage ""
+
+			if $additional; then
+				echo " [\fIARGS\fR]...";
+			else
+				echo;
+			fi;
 
 			if [ -n "$desc" ]; then
 				echo -e ".SH DESCRIPTION\n$desc";
@@ -155,9 +167,6 @@ __generate_roff() {
 
 				while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
 					if [ "$flag" = "..." -o "$flag" = "…" ]; then
-						hasExtra=true;
-						extraDesc="$desc";
-
 						continue;
 					fi;
 
@@ -165,14 +174,13 @@ __generate_roff() {
 					sed -e 's/,/, /g; s/#//g' <<< "$flag$(__flag_type "$type")";
 					echo "$desc";
 				done < <(__flags);
-
-				if $hasExtra; then
-					echo -en ".TP\n.B ...";
-					sed -e 's/,/, /g; s/#//g' <<< "$flag$(__flag_type "$type")";
-					echo "$extraDesc";
-				fi;
 			fi;
 		done < <(__parts);
+
+		if [ -n "$additionalDesc" ]; then
+			echo ".SH ADDITIONAL ARGUMENTS";
+			echo "$additionalDesc";
+		fi;
 	fi;
 }
 
