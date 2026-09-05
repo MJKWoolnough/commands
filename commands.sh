@@ -56,6 +56,25 @@ __flags() {
 	done < <(__sections | sed -n '/^#/d; /^: /!q; s/^:  *//p');
 }
 
+__print_flags_usage() {
+	while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
+		flag="${flag%,*}";
+
+		if [ "$flag" = "..." -o "$flag" = "…" ]; then
+			additional=true;
+			additionalDesc="$desc";
+		elif [ "${type: -1}" = "]" -o "$type" = "" ]; then
+			echo -n " [$flag$(__flag_type "${type:-}")]";
+
+			if [ "${type: -2}" = "[]" ]; then
+				echo -n "...";
+			fi;
+		else
+			printf " %s%s" "$flag" "$(__flag_type "$type")";
+		fi;
+	done < <(__flags);
+}
+
 __generate_roff() {
 	declare cmd="$(basename "$0")";
 	declare desc="$(__description)";
@@ -319,28 +338,11 @@ __usage() {
 
 	echo -n "Usage: $0 [--help]${solo- ${part:-SUBCOMMAND}}";
 
-	while read -r -d '' flag && read -r -d '' type && read -r -d '' desc; do
-		flag="${flag%,*}";
+	if [ -n "$part" ]; then
+		part="" __print_flags_usage;
+	fi;
 
-		if [ "$flag" = "..." -o "$flag" = "…" ]; then
-			additional=true;
-			additionalDesc="$desc";
-		elif [ "${type: -1}" = "]" -o "$type" = "" ]; then
-			echo -n " [$flag$(__flag_type "${type:-}")]";
-
-			if [ "${type: -2}" = "[]" ]; then
-				echo -n "...";
-			fi;
-		else
-			printf " %s%s" "$flag" "$(__flag_type "$type")";
-		fi;
-	done < <(
-		if [ -n "$part" ]; then
-			part="" __flags;
-		fi;
-
-		__flags;
-	);
+	__print_flags_usage;
 
 	if $additional; then
 		echo " ARGS";
