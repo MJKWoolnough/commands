@@ -69,7 +69,7 @@ __print_flags_usage() {
 		flag="${flag%,*}";
 
 		if [ "$flag" = "..." -o "$flag" = "…" ]; then
-			additional=true;
+			additional="1";
 			additionalDesc="$desc";
 		elif [ "${type: -1}" = "]" -o "$type" = "" ]; then
 			echo -n " [${1+\\fI}$flag${1+\\fR}$(__flag_type "${type:-}")]";
@@ -138,7 +138,7 @@ __generate_roff() {
 	fi;
 
 	if [ ! -v solo ]; then
-		declare additional=false;
+		declare additional="";
 		declare additionalDesc="";
 
 		while read part; do
