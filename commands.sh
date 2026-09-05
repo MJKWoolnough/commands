@@ -94,7 +94,15 @@ __generate_roff() {
 	echo "$cmd";
 	echo ".SH SYNOPSIS";
 	echo ".B $cmd";
-	echo "${solo-\fIsubcommand\fR$(part="" __print_flags_usage "") [\fIsubcommand_}${solo+[\fI}flags\fR]";
+
+	if [ -v solo ]; then
+		echo -n "\f";
+		__print_flags_usage "";
+		echo;
+	else
+		echo "\fIsubcommand\fR$(part="" __print_flags_usage "") [\fIsubcommand_flags\fR]";
+	fi;
+
 	echo -e "${desc:+.SH DESCRIPTION\n$desc}";
 
 	if [ ! -v solo ]; then
